@@ -2,6 +2,7 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -11,6 +12,7 @@ public class Player {
     private int playerID;
     private int enemyPlayer;
     private boolean buttonsEnable;
+    private ArrayList<PanCard> playerHand;
 
     private ClientSideConnection csc;
 
@@ -21,6 +23,7 @@ public class Player {
     public void doSth(){
         csc.setPlayersNumber();
     }
+
 
     //Client conections
     private class ClientSideConnection {
@@ -64,14 +67,43 @@ public class Player {
             }
         }
 
+        public void readCards() {
+            try {
+                while(true) {
+                    int startGameFlag = 0;
+                    System.out.println("infinite loop");
+                    startGameFlag = dataIn.readInt();
+                    if(startGameFlag == 1) break;
+                }
+                System.out.println("Go out of infinite loop");
+
+                int cardNumber = dataIn.readInt();
+                System.out.println("number of cards " + cardNumber );
+                int cardBuffer[][] = new int[cardNumber][2];
+                for(int i = 0; i < cardNumber; i++) {
+                    cardBuffer[i][0] = dataIn.readInt();
+                    cardBuffer[i][1] = dataIn.readInt();
+                }
+
+                for(int i = 0; i < cardNumber; i++) {
+                    System.out.println(cardBuffer[i][0] + " " + cardBuffer[i][1]);
+                }
+
+            } catch (IOException ex) {
+                System.out.println("IOException from readCards() ");
+            }
+        }
+
     }
 
     public static void main(String[] args) {
         Player p = new Player();
         p.connectToSever();
         if(p.playerID == 1) {
-            p.doSth();
+            p.csc.setPlayersNumber();
         }
+        System.out.println("TESTESTSET");
+        p.csc.readCards();
 
     }
 }

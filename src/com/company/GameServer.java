@@ -2,6 +2,9 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 
 public class GameServer {
 
@@ -13,12 +16,25 @@ public class GameServer {
     private ServerSideConnection player3;
     private ServerSideConnection player4;
 
+    private PanDeck gameDeck;
+    private ArrayList<ArrayList<PanCard>> playerHand;
+    private ArrayList<PanCard> stockpile;
+
+    private PanCard.Color validColor;
+    private PanCard.Value validValue;
+
+
 
 
     public GameServer() {
         System.out.println("---- Game Server ----");
         numPlayers = 2;
         numConPlayers = 0;
+        gameDeck = new PanDeck();
+        gameDeck.shuffle();
+        stockpile = new ArrayList<PanCard>();
+        playerHand = new ArrayList<ArrayList<PanCard>>(); // tablica tablic z kartami graczy
+
         try {
             ss = new ServerSocket(55557);
         } catch (IOException ex) {
@@ -49,6 +65,10 @@ public class GameServer {
             }
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections");
+        }
+        for(int i = 0; i < numPlayers; i++) {
+            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+            playerHand.add(hand);
         }
     }
 
@@ -81,15 +101,33 @@ public class GameServer {
             try {
                 dataOut.writeInt(playerID);
                 dataOut.flush();
-                    try {
-                        if (playerID == 1) {
-                            dataOut.writeUTF("Type number of players");
-                            numPlayers = dataIn.readInt();
-                            System.out.println("Number of players is " + numPlayers);
-                        }
-                    } catch (IOException ex) {
-                        System.out.println("IOException from input PLayer number");
+                try {
+                    if (playerID == 1) {
+                        dataOut.writeUTF("Type number of players");
+                        numPlayers = dataIn.readInt();
+                        System.out.println("Number of players is " + numPlayers);
                     }
+                } catch (IOException ex) {
+                    System.out.println("IOException from input PLayer number");
+                }
+
+                while(numConPlayers != numPlayers) ();
+                }
+                notifyAll();
+//                dataOut.writeInt(1);
+//                dataOut.flush();
+
+                int numOfCards = (gameDeck.getLength() / numPlayers);
+                dataOut.writeInt(numOfCards);
+                dataOut.flush();
+
+                for(int i = 0; i < numOfCards; i++) {
+                    PanCard tempCard = playerHand.get(playerID -  1).get(i);
+                    dataOut.writeInt(tempCard.getColorInt());
+                    dataOut.writeInt(tempCard.getValueInt());
+                    dataOut.flush();
+                }
+
             } catch (IOException ex) {
                 System.out.println("IOException from run() SSC");
             }

@@ -16,10 +16,9 @@ public class PanDeck {
         cardsInDeck = 0;
 
         for(int i = 0; i < colors.length; i++) {
-            PanCard.Color color = colors[i];
-
+            //PanCard.Color color = colors[i];
             for(int j = 0; j < PanCard.Value.values().length; j++) {
-                cards[cardsInDeck++] = new PanCard(color, PanCard.Value.getValue(j));
+                cards[cardsInDeck++] = new PanCard(PanCard.Color.getColor(i), PanCard.Value.getValue(j));
             }
         }
     }

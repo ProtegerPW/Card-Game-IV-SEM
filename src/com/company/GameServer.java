@@ -81,20 +81,15 @@ public class GameServer {
             try {
                 dataOut.writeInt(playerID);
                 dataOut.flush();
-
-                while (true) {
                     try {
                         if (playerID == 1) {
                             dataOut.writeUTF("Type number of players");
                             numPlayers = dataIn.readInt();
-//                            if(numPlayers > 4) continue;
                             System.out.println("Number of players is " + numPlayers);
-                            break;
                         }
                     } catch (IOException ex) {
                         System.out.println("IOException from input PLayer number");
                     }
-                }
             } catch (IOException ex) {
                 System.out.println("IOException from run() SSC");
             }

@@ -47,7 +47,16 @@ public class Player {
             try {
                 Scanner keyboard = new Scanner(System.in);
                 System.out.println(dataIn.readUTF());
-                int playerNum = keyboard.nextInt();
+                int playerNum = 0;
+                while(true) {
+                    playerNum = keyboard.nextInt();
+                    if (playerNum > 4 || playerNum < 2 || playerNum == 3) {
+                        System.out.println("Error. Please select 2 or 4 players");
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
                 dataOut.writeInt(playerNum);
                 dataOut.flush();
             } catch (IOException ex) {
@@ -63,6 +72,7 @@ public class Player {
         if(p.playerID == 1) {
             p.doSth();
         }
+
     }
 }
 

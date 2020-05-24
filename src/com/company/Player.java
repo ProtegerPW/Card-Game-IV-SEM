@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 
 public class Player {
@@ -69,13 +70,17 @@ public class Player {
 
         public void readCards() {
             try {
-                while(true) {
-                    int startGameFlag = 0;
-                    System.out.println("infinite loop");
-                    startGameFlag = dataIn.readInt();
-                    if(startGameFlag == 1) break;
-                }
-                System.out.println("Go out of infinite loop");
+//                try {
+//                    int startGameFlag = 0;
+//                    while (true) {
+//                        System.out.println("infinite loop");
+//                        startGameFlag = dataIn.readInt();
+//                        if (startGameFlag == 1) break;
+//                    }
+//                    System.out.println("Go out of infinite loop");
+//                } catch (IOException ex) {
+//                    System.out.println("Exception from exit infi loop");
+//                }
 
                 int cardNumber = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
@@ -88,8 +93,9 @@ public class Player {
                 for(int i = 0; i < cardNumber; i++) {
                     System.out.println(cardBuffer[i][0] + " " + cardBuffer[i][1]);
                 }
+                TimeUnit.SECONDS.sleep(20);
 
-            } catch (IOException ex) {
+            } catch (IOException | InterruptedException ex) {
                 System.out.println("IOException from readCards() ");
             }
         }
@@ -102,8 +108,9 @@ public class Player {
         if(p.playerID == 1) {
             p.csc.setPlayersNumber();
         }
-        System.out.println("TESTESTSET");
+        //System.out.println("TESTESTSET");
         p.csc.readCards();
+
 
     }
 }

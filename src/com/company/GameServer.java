@@ -66,10 +66,10 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections");
         }
-        for(int i = 0; i < numPlayers; i++) {
-            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
-            playerHand.add(hand);
-        }
+//        for(int i = 0; i < numPlayers; i++) {
+//            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+//            playerHand.add(hand);
+//        }
     }
 
     public void closeConnection() {
@@ -106,14 +106,24 @@ public class GameServer {
                         dataOut.writeUTF("Type number of players");
                         numPlayers = dataIn.readInt();
                         System.out.println("Number of players is " + numPlayers);
+                        for(int i = 0; i < numPlayers; i++) {
+                            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+                            playerHand.add(hand);
+                        }
                     }
                 } catch (IOException ex) {
                     System.out.println("IOException from input PLayer number");
                 }
 
-                while(numConPlayers != numPlayers) ();
-                }
-                notifyAll();
+//                while(numConPlayers != numPlayers) {
+//                    wait(100);
+//                    //System.out.println(numConPlayers);
+//                    if(numConPlayers == numPlayers) {
+//                        break;
+//                    }
+//                };
+
+//                notifyAll();
 //                dataOut.writeInt(1);
 //                dataOut.flush();
 
@@ -122,7 +132,7 @@ public class GameServer {
                 dataOut.flush();
 
                 for(int i = 0; i < numOfCards; i++) {
-                    PanCard tempCard = playerHand.get(playerID -  1).get(i);
+                    PanCard tempCard = playerHand.get(playerID - 1).get(i);
                     dataOut.writeInt(tempCard.getColorInt());
                     dataOut.writeInt(tempCard.getValueInt());
                     dataOut.flush();

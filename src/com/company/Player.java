@@ -13,7 +13,8 @@ public class Player {
     private int playerID;
     private int enemyPlayer;
     private boolean buttonsEnable;
-    private ArrayList<PanCard> playerHand;
+    private int cardBuffer[][];
+
 
     private ClientSideConnection csc;
 
@@ -84,11 +85,15 @@ public class Player {
 
                 int cardNumber = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
-                int cardBuffer[][] = new int[cardNumber][2];
+                cardBuffer = new int[cardNumber][2];
                 for(int i = 0; i < cardNumber; i++) {
                     cardBuffer[i][0] = dataIn.readInt();
                     cardBuffer[i][1] = dataIn.readInt();
                 }
+//                PanCard sorting = new PanCard();
+//                sorting.sortTable(cardBuffer);
+
+                PanCard.sortTable(cardBuffer);
 
                 for(int i = 0; i < cardNumber; i++) {
                     System.out.println(cardBuffer[i][0] + " " + cardBuffer[i][1]);

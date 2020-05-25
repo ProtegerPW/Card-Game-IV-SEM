@@ -1,5 +1,8 @@
 package com.company;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class PanCard {
     enum Color {
         Spade, Club, Heart, Diamond;
@@ -12,7 +15,7 @@ public class PanCard {
     }
 
     enum Value {
-       Nine, Ten, Jack, Queen, King, Ace;
+        Nine, Ten, Jack, Queen, King, Ace;
 
         private static final Value[] values = Value.values();
 
@@ -33,14 +36,14 @@ public class PanCard {
         this.valueInt = getValueInt();
     }
 
-    public Color getColor(){
+    public Color getColor() {
         return this.color;
     }
 
     public int getColorInt() {
         int colorNum;
         String colorName = this.color.toString();
-        switch(colorName) {
+        switch (colorName) {
             case "Spade":
                 colorNum = 0;
                 break;
@@ -59,14 +62,14 @@ public class PanCard {
         return colorNum;
     }
 
-    public Value getValue(){
+    public Value getValue() {
         return this.value;
     }
 
     public int getValueInt() {
         int valueNum;
         String valueName = this.value.toString();
-        switch(valueName) {
+        switch (valueName) {
             case "Nine":
                 valueNum = 0;
                 break;
@@ -93,5 +96,45 @@ public class PanCard {
 
     public String toString() {
         return color + "_" + value;
+    }
+
+
+
+//    static abstract class CardSortingComparator implements Comparator<int> {
+//        @Override
+//        public int compare(int[] o1, int[] o2, int[] r1, int[] r2) {
+//            Integer cardIdOne = o1[0];
+//            Integer cardIdTwo = o2[0];
+//            Integer cardRowOne = r1[1];
+//            Integer cardRowTwo = r2[1];
+//            int colorCompare = cardIdOne.compareTo(cardIdTwo);
+//            int nameCompare = cardRowOne.compareTo(cardRowTwo);
+//            if (colorCompare == 0) {
+//                return ((nameCompare == 0) ? colorCompare : nameCompare);
+//            } else {
+//                return colorCompare;
+//            }
+//            return cardIdOne.compareTo(cardIdTwo);
+//        }
+//    }
+
+    public static void sortTable (int cardTable[][]) {
+
+        Arrays.sort(cardTable, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                Integer cardColorOne = o1[0];
+                Integer cardColorTwo = o2[0];
+                Integer cardNameOne = o1[1];
+                Integer cardNameTwo = o2[1];
+                Integer colorCompare = cardColorOne.compareTo(cardColorTwo);
+                Integer nameCompare = cardNameOne.compareTo(cardNameTwo);
+                if (colorCompare == 0) {
+                    return ((nameCompare == 0) ? colorCompare : nameCompare);
+                } else {
+                    return colorCompare;
+                }
+            }
+        });
     }
 }

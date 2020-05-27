@@ -53,14 +53,10 @@ public class Player {
                 Scanner keyboard = new Scanner(System.in);
                 System.out.println(dataIn.readUTF());
                 int playerNum = 0;
-                while(true) {
+                while( playerNum != 2 && playerNum != 4 ) {
                     playerNum = keyboard.nextInt();
-                    if (playerNum > 4 || playerNum < 2 || playerNum == 3) {
+                    if( playerNum != 2 && playerNum != 4 )
                         System.out.println("Error. Please select 2 or 4 players");
-                        continue;
-                    } else {
-                        break;
-                    }
                 }
                 dataOut.writeInt(playerNum);
                 dataOut.flush();

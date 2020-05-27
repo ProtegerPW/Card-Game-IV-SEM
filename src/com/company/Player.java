@@ -80,7 +80,11 @@ public class Player {
 //                }
 
                 int cardNumber = dataIn.readInt();
+                int firstTurn = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
+                if(firstTurn == 1) {
+                    System.out.println("You begin!");
+                }
                 cardBuffer = new int[cardNumber][2];
                 for(int i = 0; i < cardNumber; i++) {
                     cardBuffer[i][0] = dataIn.readInt();

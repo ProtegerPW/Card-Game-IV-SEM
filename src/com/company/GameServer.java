@@ -19,9 +19,10 @@ public class GameServer {
     private PanDeck gameDeck;
     private ArrayList<ArrayList<PanCard>> playerHand;
     private ArrayList<PanCard> stockpile;
-
     private PanCard.Color validColor;
     private PanCard.Value validValue;
+
+    int currentPlayer;
 
 
 
@@ -141,7 +142,16 @@ public class GameServer {
 //                dataOut.flush();
 
                 int numOfCards = (gameDeck.getLength() / numPlayers);
+                int playerFlag = 0;
+                int zeroColor = playerHand.get(playerID - 1).get(0).getColorInt();
+                int zeroValue = playerHand.get(playerID - 1).get(0).getValueInt();
+                if(zeroColor == 0 && zeroValue == 0) {
+                    currentPlayer = playerID;
+                    System.out.println("First player is " + playerID);
+                    playerFlag = 1;
+                }
                 dataOut.writeInt(numOfCards);
+                dataOut.writeInt(playerFlag);
                 dataOut.flush();
 
                 for(int i = 0; i < numOfCards; i++) {

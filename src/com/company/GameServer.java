@@ -28,7 +28,7 @@ public class GameServer {
 
     public GameServer() {
         System.out.println("---- Game Server ----");
-        numPlayers = 2;
+        numPlayers = 1;
         numConPlayers = 0;
         gameDeck = new PanDeck();
         gameDeck.shuffle();
@@ -37,8 +37,37 @@ public class GameServer {
 
         try {
             ss = new ServerSocket(55557);
+            ss.setSoTimeout(60*1000);
         } catch (IOException ex) {
             System.out.println("IOException from GameSever Constructor");
+        }
+    }
+
+    public void waitForHost() {
+        try {
+            System.out.println("Waiting for host...");
+            Socket s = ss.accept();
+            System.out.println("Player #1 has connected");
+            ServerSideConnection ssc = new ServerSideConnection(s, 1);
+            player1 = ssc;
+            try {
+                ssc.dataOut.writeInt(1);
+                ssc.dataOut.flush();
+                ssc.dataOut.writeUTF("Type number of players");
+                numPlayers = ssc.dataIn.readInt();
+                System.out.println("Number of players is " + numPlayers);
+            } catch (IOException ex) {
+                System.out.println("IOException from input Player number");
+            }
+            for(int i = 0; i < numPlayers; i++) {
+                ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+                playerHand.add(hand);
+            }
+            numConPlayers++;
+            Thread t = new Thread(ssc);
+            t.start();
+        } catch (IOException ex) {
+            System.out.println("IOException from acceptConnections");
         }
     }
 
@@ -51,15 +80,15 @@ public class GameServer {
                 System.out.println("Player #" + numConPlayers + " has connected");
 
                 ServerSideConnection ssc = new ServerSideConnection(s, numConPlayers);
-                if (numConPlayers == 1) {
-                    player1 = ssc;
-                } else if (numConPlayers == 2){
+                if (numConPlayers == 2){
                     player2 = ssc;
                 } else if (numConPlayers == 3){
                     player3 = ssc;
                 } else {
                     player4 = ssc;
                 }
+                ssc.dataOut.writeInt(ssc.playerID);
+                ssc.dataOut.flush();
                 Thread t = new Thread(ssc);
                 t.start();
             }
@@ -99,22 +128,6 @@ public class GameServer {
 
         public void run() {
             try {
-                dataOut.writeInt(playerID);
-                dataOut.flush();
-                try {
-                    if (playerID == 1) {
-                        dataOut.writeUTF("Type number of players");
-                        numPlayers = dataIn.readInt();
-                        System.out.println("Number of players is " + numPlayers);
-                        for(int i = 0; i < numPlayers; i++) {
-                            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
-                            playerHand.add(hand);
-                        }
-                    }
-                } catch (IOException ex) {
-                    System.out.println("IOException from input PLayer number");
-                }
-
 //                while(numConPlayers != numPlayers) {
 //                    wait(100);
 //                    //System.out.println(numConPlayers);
@@ -147,7 +160,8 @@ public class GameServer {
 
     public static void main(String[] args) {
         GameServer gs = new GameServer();
+        gs.waitForHost();
         gs.acceptConnections();
-        gs.closeConnection();
+        //gs.closeConnection();
     }
 }

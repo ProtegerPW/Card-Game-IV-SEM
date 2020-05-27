@@ -27,7 +27,7 @@ public class Player {
     }
 
 
-    //Client conections
+    //Client connections
     private class ClientSideConnection {
         private Socket socket;
         private DataInputStream dataIn;
@@ -39,7 +39,7 @@ public class Player {
                 socket = new Socket("localhost", 55557);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
-
+                System.out.println("Constructed");
                 playerID = dataIn.readInt();
                 System.out.println("Connected to server as player number " + playerID);
             } catch (IOException ex) {

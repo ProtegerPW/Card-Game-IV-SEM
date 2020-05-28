@@ -67,32 +67,16 @@ public class Player {
 
         public void readCards() {
             try {
-//                try {
-//                    int startGameFlag = 0;
-//                    while (true) {
-//                        System.out.println("infinite loop");
-//                        startGameFlag = dataIn.readInt();
-//                        if (startGameFlag == 1) break;
-//                    }
-//                    System.out.println("Go out of infinite loop");
-//                } catch (IOException ex) {
-//                    System.out.println("Exception from exit infi loop");
-//                }
-
                 int cardNumber = dataIn.readInt();
-                int firstTurn = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
-                if(firstTurn == 1) {
-                    System.out.println("You begin!");
-                }
                 cardBuffer = new int[cardNumber][2];
                 for(int i = 0; i < cardNumber; i++) {
                     cardBuffer[i][0] = dataIn.readInt();
                     cardBuffer[i][1] = dataIn.readInt();
                 }
-//                PanCard sorting = new PanCard();
-//                sorting.sortTable(cardBuffer);
-
+                if(dataIn.readInt() == 1) {
+                    System.out.println("You begin!");
+                }
                 PanCard.sortTable(cardBuffer);
 
                 for(int i = 0; i < cardNumber; i++) {
@@ -104,7 +88,6 @@ public class Player {
                 System.out.println("IOException from readCards() ");
             }
         }
-
     }
 
     public static void main(String[] args) {

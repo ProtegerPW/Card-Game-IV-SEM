@@ -96,10 +96,6 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections");
         }
-//        for(int i = 0; i < numPlayers; i++) {
-//            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
-//            playerHand.add(hand);
-//        }
     }
 
     public void closeConnection() {
@@ -129,37 +125,23 @@ public class GameServer {
 
         public void run() {
             try {
-//                while(numConPlayers != numPlayers) {
-//                    wait(100);
-//                    //System.out.println(numConPlayers);
-//                    if(numConPlayers == numPlayers) {
-//                        break;
-//                    }
-//                };
-
-//                notifyAll();
-//                dataOut.writeInt(1);
-//                dataOut.flush();
-
                 int numOfCards = (gameDeck.getLength() / numPlayers);
                 int playerFlag = 0;
-                int zeroColor = playerHand.get(playerID - 1).get(0).getColorInt();
-                int zeroValue = playerHand.get(playerID - 1).get(0).getValueInt();
-                if(zeroColor == 0 && zeroValue == 0) {
-                    currentPlayer = playerID;
-                    System.out.println("First player is " + playerID);
-                    playerFlag = 1;
-                }
                 dataOut.writeInt(numOfCards);
-                dataOut.writeInt(playerFlag);
                 dataOut.flush();
 
                 for(int i = 0; i < numOfCards; i++) {
                     PanCard tempCard = playerHand.get(playerID - 1).get(i);
                     dataOut.writeInt(tempCard.getColorInt());
                     dataOut.writeInt(tempCard.getValueInt());
-                    dataOut.flush();
+                    if(tempCard.getColorInt() == 0 && tempCard.getValueInt() == 0) {
+                        currentPlayer = playerID;
+                        System.out.println("First player is " + playerID);
+                        playerFlag = 1;
+                    }
                 }
+                dataOut.writeInt(playerFlag);
+                dataOut.flush();
 
             } catch (IOException ex) {
                 System.out.println("IOException from run() SSC");
@@ -175,3 +157,4 @@ public class GameServer {
         //gs.closeConnection();
     }
 }
+//

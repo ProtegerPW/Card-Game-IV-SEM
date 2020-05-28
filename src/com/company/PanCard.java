@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 public class PanCard {
     enum Color {
-        Spade, Club, Heart, Diamond;
+        Heart, Spade, Diamond, Club ;
 
         private static final Color[] colors = Color.values();
 

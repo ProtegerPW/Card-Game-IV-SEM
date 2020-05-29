@@ -8,10 +8,10 @@ public class PanDeck {
 
     public PanDeck() {
         cards = new PanCard[24];
-        this.reset();
+        this.setDeck();
     }
 
-    public void reset () {
+    public void setDeck() {
         PanCard.Color[] colors = PanCard.Color.values();
         cardsInDeck = 0;
 

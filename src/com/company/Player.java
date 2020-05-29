@@ -23,7 +23,6 @@ public class Player {
         handOfCards = new ArrayList<ArrayList<Integer>>();
     }
 
-
     private ClientSideConnection csc;
 
     public void connectToSever() {
@@ -39,7 +38,6 @@ public class Player {
             }
         };
     }
-
 
     //Client connections
     private class ClientSideConnection {
@@ -61,7 +59,6 @@ public class Player {
                 System.out.println("IO Exception from CSC constructor");
             }
         }
-
 
         public void setPlayersNumber() {
             try {

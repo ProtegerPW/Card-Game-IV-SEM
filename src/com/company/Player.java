@@ -3,7 +3,9 @@ package com.company;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import ui.controller.MenuFrameController;
+
+import ui.controller.FrameController;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -12,15 +14,21 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Player {
-
     //part for player info
     private int playerID;
-    private int enemyPlayer;
+    private int turn;
     private boolean buttonsEnable;
     private ArrayList<ArrayList<Integer>> handOfCards;
+    private ArrayList<PanCard> stockpile;
+    private PanCard topCard;
+    private int[] cardCount;
 
     public Player() {
         handOfCards = new ArrayList<ArrayList<Integer>>();
+    }
+
+    public void setTopCard(PanCard topCard) {
+        this.topCard = topCard;
     }
 
     private ClientSideConnection csc;
@@ -81,7 +89,7 @@ public class Player {
             try {
                 int cardNumber = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
-
+                initCardCount(cardNumber);
                 for(int i = 0; i < cardNumber; i++) {
                     ArrayList<Integer> cardBuffer = new ArrayList<Integer>();
                     cardBuffer.add(dataIn.readInt());
@@ -107,15 +115,24 @@ public class Player {
         }
     }
 
+    private void initCardCount(int cardNumber) {
+        if(6 == cardNumber)
+            cardCount = new int[]{6, 6, 6, 6};
+        else
+            cardCount = new int[]{12, 12};
+    }
+
     public static void main(String[] args) {
-        MenuFrameController menuFrameController = new MenuFrameController();
-        menuFrameController.showMenuFrameWindow();
         Player p = new Player();
         p.connectToSever();
         if(p.playerID == 1) {
             p.csc.setPlayersNumber();
         }
+        FrameController frameController = new FrameController();
+        // TODO frameController.obtainData(p);
+        // TODO p <- action (draw/play 1 card/play multiple cards)
+        // TODO communicate with server
+        // TODO frameController.update(), p.update();
+        p.csc.readCards();
     }
 }
-
-//testestestestestestestestestestesetsetset

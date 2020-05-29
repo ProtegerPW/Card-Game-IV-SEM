@@ -24,9 +24,6 @@ public class GameServer {
 
     int currentPlayer;
 
-
-
-
     public GameServer() {
         System.out.println("---- Game Server ----");
         numPlayers = 1;

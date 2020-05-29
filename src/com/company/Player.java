@@ -1,5 +1,8 @@
 package com.company;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -13,7 +16,11 @@ public class Player {
     private int playerID;
     private int enemyPlayer;
     private boolean buttonsEnable;
-    private int cardBuffer[][];
+    private ArrayList<ArrayList<Integer>> handOfCards;
+
+    public Player() {
+        handOfCards = new ArrayList<ArrayList<Integer>>();
+    }
 
 
     private ClientSideConnection csc;
@@ -22,8 +29,14 @@ public class Player {
         csc = new ClientSideConnection();
     }
 
-    public void doSth(){
-        csc.setPlayersNumber();
+    public void setUpButtons() {
+        ActionListener al = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JButton b = (JButton) actionEvent.getSource();
+
+            }
+        };
     }
 
 
@@ -69,18 +82,23 @@ public class Player {
             try {
                 int cardNumber = dataIn.readInt();
                 System.out.println("number of cards " + cardNumber );
-                cardBuffer = new int[cardNumber][2];
+
                 for(int i = 0; i < cardNumber; i++) {
-                    cardBuffer[i][0] = dataIn.readInt();
-                    cardBuffer[i][1] = dataIn.readInt();
+                    ArrayList<Integer> cardBuffer = new ArrayList<Integer>();
+                    cardBuffer.add(dataIn.readInt());
+                    cardBuffer.add(dataIn.readInt());
+                    handOfCards.add(cardBuffer);
+//                    cardBuf[0] = dataIn.readInt();
+//                    cardBuf[1] = dataIn.readInt();
+//                    handOfCards.add(cardBuf)
                 }
                 if(dataIn.readInt() == 1) {
                     System.out.println("You begin!");
                 }
-                PanCard.sortTable(cardBuffer);
+                PanCard.sortTable(handOfCards);
 
                 for(int i = 0; i < cardNumber; i++) {
-                    System.out.println(cardBuffer[i][0] + " " + cardBuffer[i][1]);
+                    System.out.println(handOfCards.get(i).get(0) + " " + handOfCards.get(i).get(1));
                 }
                 TimeUnit.SECONDS.sleep(20);
 

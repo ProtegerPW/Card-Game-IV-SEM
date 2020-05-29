@@ -3,7 +3,7 @@ package ui.view;
 import javax.swing.*;
 import java.util.ArrayList;
 
-public class TwoPlayerGameFrame extends JFrame {
+public class GameFrame extends JFrame {
     private JPanel mainGamePanel;
     private JButton playerCard0;
     private JButton opponentCard0;
@@ -11,7 +11,7 @@ public class TwoPlayerGameFrame extends JFrame {
     private ArrayList<JButton> playerHand;
     private ArrayList<JButton> opponentHand;
 
-    public TwoPlayerGameFrame() {
+    public GameFrame() {
         playerHand = new ArrayList<JButton>();
         opponentHand = new ArrayList<JButton>();
         setSize(1260, 720);

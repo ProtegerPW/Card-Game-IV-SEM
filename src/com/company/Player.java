@@ -1,8 +1,9 @@
 package com.company;
 
+import ui.controller.MenuFrameController;
+
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +38,7 @@ public class Player {
             System.out.println("---- Client ----");
             try {
                 socket = new Socket("localhost", 55557);
+                socket.setSoTimeout(30*1000);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 System.out.println("Constructed");
@@ -91,15 +93,13 @@ public class Player {
     }
 
     public static void main(String[] args) {
+        MenuFrameController menuFrameController = new MenuFrameController();
+        menuFrameController.showMenuFrameWindow();
         Player p = new Player();
         p.connectToSever();
         if(p.playerID == 1) {
             p.csc.setPlayersNumber();
         }
-        //System.out.println("TESTESTSET");
-        p.csc.readCards();
-
-
     }
 }
 

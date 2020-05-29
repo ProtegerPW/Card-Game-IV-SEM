@@ -38,7 +38,6 @@ public class GameServer {
 
         try {
             ss = new ServerSocket(55557);
-            ss.setSoTimeout(60*1000);
         } catch (IOException ex) {
             System.out.println("IOException from GameSever Constructor");
         }

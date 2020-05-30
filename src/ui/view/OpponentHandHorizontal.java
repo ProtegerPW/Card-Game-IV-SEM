@@ -1,12 +1,14 @@
 package ui.view;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class OpponentHandHorizontal {
-    private JButton gruszkaButton;
-    private JPanel panel1;
+public class OpponentHandHorizontal extends JPanel {
 
-    public JPanel getPanel() {
-        return panel1;
+    public OpponentHandHorizontal() {
+        setSize(-1, 150);
+        setPreferredSize(new Dimension(-1,150));
+        setMaximumSize(new Dimension(-1,200));
+        setBackground(Color.MAGENTA);
     }
 }

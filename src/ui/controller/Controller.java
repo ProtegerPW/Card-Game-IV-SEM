@@ -1,8 +1,9 @@
 package ui.controller;
 
 import com.company.Player;
-import ui.view.GameFrame;
-import ui.view.MenuFrame;
+import ui.view.GameSetup;
+import ui.view.GameView;
+import ui.view.Menu;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -11,31 +12,37 @@ import java.awt.event.ActionListener;
 public class Controller {
     private Player player;
     //
-    private MenuFrame menuFrame;
-    //
-    private GameFrame gameFrame;
+    private Menu menu;
+    private GameSetup gameSetup;
+    private GameView gameView;
 
-    public Controller(Player p, MenuFrame menu) {
+    public Controller(Player p, Menu menu) {
         player = p;
-        menuFrame = menu;
+        this.menu = menu;
     }
 
     public void initController() {
-        menuFrame.showMenuFrameWindow();
+        menu.showMenuWindow();
         initMenuListeners();
     }
 
     private void initMenuListeners() {
-        menuFrame.getPlayButton().addActionListener(new Controller.PlayButtonListener());
-        menuFrame.getExitButton().addActionListener(new Controller.ExitButtonListener());
+        menu.getPlayButton().addActionListener(new Controller.PlayButtonListener());
+        menu.getExitButton().addActionListener(new Controller.ExitButtonListener());
     }
 
     private class PlayButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            menuFrame.closeMenuFrame();
-            // TODO if(1 == playerID) -> GameSetupFrame
-            initGameFrameComponents();
-            showGameFrameWindow();
+            if(1 == player.getPlayerID()) {
+                gameSetup = new GameSetup();
+                gameSetup.showGameSetupWindow();
+                initGameSetupListeners();
+            }
+            else {
+                gameView = new GameView();
+                gameView.showGameFrameWindow();
+                menu.closeMenu();
+            }
         }
     }
 
@@ -47,11 +54,16 @@ public class Controller {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
-    private void initGameFrameComponents() {
-        gameFrame = new GameFrame();
+    private void initGameSetupListeners() {
+        gameSetup.getButton2().addActionListener(new Controller.NumPlayerListener());
+        gameSetup.getButton4().addActionListener(new Controller.NumPlayerListener());
     }
 
-    public void showGameFrameWindow() {
-        gameFrame.setVisible(true);
+    private class NumPlayerListener implements ActionListener {
+        public void actionPerformed(ActionEvent actionEvent) {
+            JButton b = (JButton) actionEvent.getSource();
+            int numPlayers = Integer.parseInt(b.getText());
+            player.getCsc().setPlayersNumber(numPlayers);
+        }
     }
 }

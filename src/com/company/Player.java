@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import ui.controller.Controller;
-import ui.view.MenuFrame;
+import ui.view.Menu;
 
 import java.io.*;
 import java.net.*;
@@ -24,6 +24,8 @@ public class Player {
     private PanCard topCard;
     private int[] cardCount;
 
+    private ClientSideConnection csc;
+
     public Player() {
         handOfCards = new ArrayList<ArrayList<Integer>>();
     }
@@ -32,9 +34,7 @@ public class Player {
         this.topCard = topCard;
     }
 
-    private ClientSideConnection csc;
-
-    public void connectToSever() {
+    public void connectToServer() {
         csc = new ClientSideConnection();
     }
 
@@ -125,10 +125,10 @@ public class Player {
 
     public static void main(String[] args) {
         Player player = new Player();
-        MenuFrame menuFrame = new MenuFrame();
-        Controller controller = new Controller(player, menuFrame);
+        Menu menu = new Menu();
+        Controller controller = new Controller(player, menu);
         controller.initController();
-        player.connectToSever();
+        player.connectToServer();
         if(player.playerID == 1) {
             player.csc.setPlayersNumber();
         }

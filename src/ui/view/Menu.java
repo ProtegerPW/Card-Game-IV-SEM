@@ -2,13 +2,13 @@ package ui.view;
 
 import javax.swing.*;
 
-public class MenuFrame extends JFrame {
+public class Menu extends JFrame {
     private JPanel menuPanel;
     private JButton playButton;
     private JButton exitButton;
     private JLabel gameTitle;
 
-    public MenuFrame() {
+    public Menu() {
         setSize(600,400);
         setContentPane(menuPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,11 +23,11 @@ public class MenuFrame extends JFrame {
         return exitButton;
     }
 
-    public void showMenuFrameWindow() {
+    public void showMenuWindow() {
         this.setVisible(true);
     }
 
-    public void closeMenuFrame() {
+    public void closeMenu() {
         this.dispose();
     }
 }

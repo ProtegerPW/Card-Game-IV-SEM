@@ -11,10 +11,7 @@ public class GameServer {
     private ServerSocket ss;
     private int numPlayers;
     private int numConPlayers;
-    private ServerSideConnection player1;
-    private ServerSideConnection player2;
-    private ServerSideConnection player3;
-    private ServerSideConnection player4;
+    private ServerSideConnection[] players;
 
     private PanDeck gameDeck;
     private ArrayList<ArrayList<PanCard>> playerHand;
@@ -28,6 +25,7 @@ public class GameServer {
         System.out.println("---- Game Server ----");
         numPlayers = 1;
         numConPlayers = 0;
+        players = new ServerSideConnection[4];
         gameDeck = new PanDeck();
         gameDeck.shuffle();
         stockpile = new ArrayList<PanCard>();
@@ -46,7 +44,7 @@ public class GameServer {
             Socket s = ss.accept();
             System.out.println("Player #1 has connected");
             ServerSideConnection ssc = new ServerSideConnection(s, 1);
-            player1 = ssc;
+            players[0] = ssc;
             try {
                 ssc.dataOut.writeInt(1);
                 ssc.dataOut.flush();
@@ -78,11 +76,11 @@ public class GameServer {
 
                 ServerSideConnection ssc = new ServerSideConnection(s, numConPlayers);
                 if (numConPlayers == 2){
-                    player2 = ssc;
+                    players[1] = ssc;
                 } else if (numConPlayers == 3){
-                    player3 = ssc;
+                    players[2] = ssc;
                 } else {
-                    player4 = ssc;
+                    players[3] = ssc;
                 }
                 ssc.dataOut.writeInt(ssc.playerID);
                 ssc.dataOut.flush();
@@ -119,15 +117,8 @@ public class GameServer {
             }
         }
 
-        public void deleteElement(int color, int value, int playerID) {
-            for(int i = 0; i < playerHand.get(playerID - 1).size(); i++ ) {
-                if(playerHand.get(playerID - 1).get(i).getColorInt() == color ) {
-                    if(playerHand.get(playerID - 1).get(i).getValueInt() == value) {
-                        playerHand.get(playerID - 1).remove(i);
-                        break;
-                    }
-                }
-            }
+        public void deleteCardFromHand(PanCard card, int playerID) {
+            if(playerHand.get(playerID - 1).contains(card)) playerHand.remove(card);
         }
 
         public void drawCard(int numOfCards) {
@@ -143,33 +134,31 @@ public class GameServer {
             }
         }
 
-        public void addCardToStockpile(int color, int value){
-            PanCard tempCard = new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value));
-            stockpile.add(tempCard);
+        public void addCardToStockpile(PanCard card){
+            stockpile.add(card);
+        }
+
+        public void readAndUpdateCardStatus(int playerID) {
+            try{
+                int numOfCards = dataIn.readInt();
+                for (int i = 0; i < numOfCards; i ++) {
+                    int color = dataIn.readInt();
+                    int value = dataIn.readInt();
+                    PanCard tempCard = new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value));
+                    deleteCardFromHand(tempCard, playerID);
+                    addCardToStockpile(tempCard);
+                }
+            } catch(IOException ex) {
+                System.out.println("IOException from readAndUpdateCardStatus() ");
+            }
         }
 
         public void performOperation(String text, int playerID) {
             try {
                 switch (text) {
 
-                    case "oneCard":
-                        int[] tempBuf = {0, 0};
-                        for (int i = 0; i < 2; i++) {
-                            tempBuf[i] = dataIn.readInt();
-                        }
-                        deleteElement(tempBuf[0], tempBuf[1], playerID);
-                        addCardToStockpile(tempBuf[0], tempBuf[1]);
-                        break;
-
-                    case "multiCard":
-                        int numOfCards = dataIn.readInt();
-                        tempBuf = new int[2 * numOfCards];
-                        for (int i = 0; i < 2 * numOfCards; i+=2) {
-                            tempBuf[i] = dataIn.readInt();
-                            tempBuf[i+1] = dataIn.readInt();
-                            deleteElement(tempBuf[i], tempBuf[i+1], playerID);
-                            addCardToStockpile(tempBuf[i], tempBuf[i+1]);
-                        }
+                    case "addCards":
+                        readAndUpdateCardStatus(playerID);
                         break;
 
                     case "drawCard":
@@ -211,8 +200,23 @@ public class GameServer {
                 dataOut.writeInt(playerFlag);
                 dataOut.flush();
 
-                while(true) { //TODO implement method for each players + add condition for 2 / 4 players
+                while(true) { //TODO send players number of cards of theri opponents
+                            //TODO send player new stockpile
                     if(playerID == 1) {
+                        String readText = dataIn.readUTF();
+                        performOperation(readText, playerID);
+
+                    } else if(playerID == 2) {
+                        String readText = dataIn.readUTF();
+                        performOperation(readText, playerID);
+                    }
+                    if(numConPlayers == 2) continue;
+                    if(playerID == 3) {
+                        String readText = dataIn.readUTF();
+                        performOperation(readText, playerID);
+                    } else if(playerID == 4) {
+                        String readText = dataIn.readUTF();
+                        performOperation(readText, playerID);
                     }
                 }
                 //TODO send info to other player about number of cards in hand

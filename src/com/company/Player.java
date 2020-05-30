@@ -152,31 +152,46 @@ public class Player {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 
-    public void addCardToHand(int color, int value) {
+    public void deleteCardFromHand(int color, int value) {
+        for(int i = 0; i < handOfCards.size(); i++) {
+            if(handOfCards.get(i).get(0) == color) {
+                if(handOfCards.get(i).get(1) == value) {
+                    handOfCards.remove(i);
+                    break;
+                }
+            }
+        }
 
+    }
+
+    public void sendAndDeleteCard(String text, ArrayList<PanCard> cards) {
+        try {
+            csc.dataOut.writeUTF(text);
+            csc.dataOut.writeInt(cards.size());
+            //eventually add csc.dataOut.flush();
+            for(int i = 0; i <= cards.size() - 1; i++) {
+                int color = cards.get(i).getColorInt();
+                int value = cards.get(i).getValueInt();
+                csc.dataOut.writeInt(color);
+                csc.dataOut.writeInt(value);
+                deleteCardFromHand(color, value);
+            }
+            csc.dataOut.flush();
+        } catch(IOException ex) {
+            System.out.println("IOException from sendAndDeleteCard() ");
+        }
     }
 
     public void sendCommunicate(String text, ArrayList<PanCard> cards) {
         try {
+            int color = 0;
+            int value = 0;
             switch(text) {
-                case "oneCard":
-                    csc.dataOut.writeUTF(text);
-                    csc.dataOut.writeInt(cards.get(0).getColorInt());
-                    csc.dataOut.writeInt(cards.get(0).getValueInt());
-                    csc.dataOut.flush();
+                case "addCards":
+                    sendAndDeleteCard(text, cards);
                     break;
 
-                case "multiCard":
-                    csc.dataOut.writeUTF(text);
-                    csc.dataOut.writeInt(cards.size());
-                    for(int i = 0; i < cards.size(); i++) {
-                        csc.dataOut.writeInt(cards.get(i).getColorInt());
-                        csc.dataOut.writeInt(cards.get(i).getValueInt());
-                    }
-                    csc.dataOut.flush();
-                    break;
-
-                case "drawCard":
+                case "drawCards":
                     csc.dataOut.writeUTF(text);
                     csc.dataOut.flush();
                     int numOfDrawCards = csc.dataIn.readInt();

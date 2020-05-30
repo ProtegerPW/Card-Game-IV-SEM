@@ -128,6 +128,14 @@ public class Player {
             cardCount = new int[]{12, 12};
     }
 
+    // TODO private void drawCards();
+        // draw = true;
+    // player.drawCards();
+
+    // TODO private bool selectedCard(PanCard card); true -> można rzucić więcej; false -> ruch zakończony
+    // bool turn = player.selectedCard(card);
+    // if(turn) ...W
+
     public static void main(String[] args) {
         Player player = new Player();
         Menu menu = new Menu();

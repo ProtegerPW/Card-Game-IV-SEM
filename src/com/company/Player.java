@@ -128,6 +128,76 @@ public class Player {
             cardCount = new int[]{12, 12};
     }
 
+    public boolean checkMultiCard(PanCard card) {
+        if(checkCardIsValid(card)) {
+            int multipleCards = 0;
+            for(int i = 0; i < handOfCards.size(); i++) {
+                if(card.getValueInt() == handOfCards.get(i).get(1)) {
+                    multipleCards++;
+                }
+            }
+            if(card.getValueInt() == 0 && multipleCards == 3) {
+                return true;
+            } else if (multipleCards == 4) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkCardIsValid(PanCard card) {
+        return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
+    }
+
+    public void addCardToHand(int color, int value) {
+
+    }
+
+    public void sendCommunicate(String text, ArrayList<PanCard> cards) {
+        try {
+            switch(text) {
+                case "oneCard":
+                    csc.dataOut.writeUTF(text);
+                    csc.dataOut.writeInt(cards.get(0).getColorInt());
+                    csc.dataOut.writeInt(cards.get(0).getValueInt());
+                    csc.dataOut.flush();
+                    break;
+
+                case "multiCard":
+                    csc.dataOut.writeUTF(text);
+                    csc.dataOut.writeInt(cards.size());
+                    for(int i = 0; i < cards.size(); i++) {
+                        csc.dataOut.writeInt(cards.get(i).getColorInt());
+                        csc.dataOut.writeInt(cards.get(i).getValueInt());
+                    }
+                    csc.dataOut.flush();
+                    break;
+
+                case "drawCard":
+                    csc.dataOut.writeUTF(text);
+                    csc.dataOut.flush();
+                    int numOfDrawCards = csc.dataIn.readInt();
+                    ArrayList<Integer> tempListOfCards;
+                    for(int i = 0; i < numOfDrawCards; i++) {
+                        tempListOfCards = new ArrayList<Integer>();
+                        tempListOfCards.add(csc.dataIn.readInt());
+                        tempListOfCards.add(csc.dataIn.readInt());
+                        handOfCards.add(tempListOfCards);
+                    }
+                    PanCard.sortTable(handOfCards);
+                    break;
+            }
+
+        } catch(IOException ex){
+            System.out.println("IOException from sendCommunicate() ");
+        }
+    }
+
+
+
     // TODO private void drawCards();
         // draw = true;
     // player.drawCards();

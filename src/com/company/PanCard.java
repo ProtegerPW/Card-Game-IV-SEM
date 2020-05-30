@@ -108,10 +108,10 @@ public class PanCard {
                 Integer colorCompare = firstCard.get(0).compareTo(secondCard.get(0));
                 Integer cardCompare = firstCard.get(1).compareTo(secondCard.get(1));
 
-                if (colorCompare == 0) {
-                    return ((cardCompare == 0) ? colorCompare : cardCompare);
+                if (cardCompare == 0) {
+                    return ((colorCompare == 0) ? cardCompare : colorCompare);
                 } else {
-                    return colorCompare;
+                    return cardCompare;
                 }
             }
         });

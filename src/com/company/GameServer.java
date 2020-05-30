@@ -119,6 +119,78 @@ public class GameServer {
             }
         }
 
+        public void deleteElement(int color, int value, int playerID) {
+            for(int i = 0; i < playerHand.get(playerID - 1).size(); i++ ) {
+                if(playerHand.get(playerID - 1).get(i).getColorInt() == color ) {
+                    if(playerHand.get(playerID - 1).get(i).getValueInt() == value) {
+                        playerHand.get(playerID - 1).remove(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void drawCard(int numOfCards) {
+            try {
+                for (int i = 0; i < numOfCards; i++) {
+                    dataOut.writeInt(stockpile.get(stockpile.size() - 1).getColorInt());
+                    dataOut.writeInt(stockpile.get(stockpile.size() - 1).getValueInt());
+                    stockpile.remove(stockpile.size() - 1);
+                }
+                dataOut.flush();
+            } catch (IOException ex) {
+                System.out.println("IOException from drawCard() ");
+            }
+        }
+
+        public void addCardToStockpile(int color, int value){
+            PanCard tempCard = new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value));
+            stockpile.add(tempCard);
+        }
+
+        public void performOperation(String text, int playerID) {
+            try {
+                switch (text) {
+
+                    case "oneCard":
+                        int[] tempBuf = {0, 0};
+                        for (int i = 0; i < 2; i++) {
+                            tempBuf[i] = dataIn.readInt();
+                        }
+                        deleteElement(tempBuf[0], tempBuf[1], playerID);
+                        addCardToStockpile(tempBuf[0], tempBuf[1]);
+                        break;
+
+                    case "multiCard":
+                        int numOfCards = dataIn.readInt();
+                        tempBuf = new int[2 * numOfCards];
+                        for (int i = 0; i < 2 * numOfCards; i+=2) {
+                            tempBuf[i] = dataIn.readInt();
+                            tempBuf[i+1] = dataIn.readInt();
+                            deleteElement(tempBuf[i], tempBuf[i+1], playerID);
+                            addCardToStockpile(tempBuf[i], tempBuf[i+1]);
+                        }
+                        break;
+
+                    case "drawCard":
+                        int tempStockSize = 0;
+                        if(stockpile.size() > 3) {
+                            tempStockSize = 3;
+                        } else if(stockpile.size() == 3) {
+                            tempStockSize = 2;
+                        } else if(stockpile.size() == 2) {
+                            tempStockSize = 1;
+                        }
+                        dataOut.writeInt(tempStockSize);
+                        dataOut.flush();
+                        drawCard(tempStockSize);
+                        break;
+                }
+            }catch (IOException ex) {
+                System.out.println("IOException from performOperation() ");
+            }
+        }
+
         public void run() {
             try {
                 int numOfCards = (gameDeck.getLength() / numPlayers);
@@ -138,6 +210,12 @@ public class GameServer {
                 }
                 dataOut.writeInt(playerFlag);
                 dataOut.flush();
+
+                while(true) { //TODO implement method for each players + add condition for 2 / 4 players
+                    if(playerID == 1) {
+                    }
+                }
+                //TODO send info to other player about number of cards in hand
 
             } catch (IOException ex) {
                 System.out.println("IOException from run() SSC");

@@ -30,6 +30,18 @@ public class Player {
         handOfCards = new ArrayList<ArrayList<Integer>>();
     }
 
+    public int getPlayerID() {
+        return playerID;
+    }
+
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
+    }
+
+    public ClientSideConnection getCsc() {
+        return csc;
+    }
+
     public void setTopCard(PanCard topCard) {
         this.topCard = topCard;
     }
@@ -62,7 +74,7 @@ public class Player {
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 System.out.println("Constructed");
-                playerID = dataIn.readInt();
+                setPlayerID(dataIn.readInt());
                 System.out.println("Connected to server as player number " + playerID);
             } catch (IOException ex) {
                 System.out.println("IO Exception from CSC constructor");

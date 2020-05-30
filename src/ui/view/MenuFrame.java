@@ -23,7 +23,11 @@ public class MenuFrame extends JFrame {
         return exitButton;
     }
 
-    public JLabel getGameTitle() {
-        return gameTitle;
+    public void showMenuFrameWindow() {
+        this.setVisible(true);
+    }
+
+    public void closeMenuFrame() {
+        this.dispose();
     }
 }

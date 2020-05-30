@@ -4,7 +4,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import ui.controller.FrameController;
+import ui.controller.Controller;
+import ui.view.MenuFrame;
 
 import java.io.*;
 import java.net.*;
@@ -123,16 +124,17 @@ public class Player {
     }
 
     public static void main(String[] args) {
-        Player p = new Player();
-        p.connectToSever();
-        if(p.playerID == 1) {
-            p.csc.setPlayersNumber();
+        Player player = new Player();
+        MenuFrame menuFrame = new MenuFrame();
+        Controller controller = new Controller(player, menuFrame);
+        controller.initController();
+        player.connectToSever();
+        if(player.playerID == 1) {
+            player.csc.setPlayersNumber();
         }
-        FrameController frameController = new FrameController();
         // TODO frameController.obtainData(p);
         // TODO p <- action (draw/play 1 card/play multiple cards)
         // TODO communicate with server
         // TODO frameController.update(), p.update();
-        p.csc.readCards();
     }
 }

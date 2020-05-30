@@ -1,16 +1,16 @@
 package com.company;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import ui.controller.Controller;
 import ui.view.Menu;
 
-import java.io.*;
-import java.net.*;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,6 +27,7 @@ public class Player {
     private ClientSideConnection csc;
 
     public Player() {
+        playerID = -1;
         handOfCards = new ArrayList<ArrayList<Integer>>();
     }
 
@@ -60,8 +61,17 @@ public class Player {
         };
     }
 
+    public void setPlayersNumber(int playerNum) {
+        try {
+            csc.dataOut.writeInt(playerNum);
+            csc.dataOut.flush();
+        } catch (IOException ex) {
+            System.out.println("IOException from setPlayerNum() CSC");
+        }
+    }
+
     //Client connections
-    private class ClientSideConnection {
+    public class ClientSideConnection {
         private Socket socket;
         private DataInputStream dataIn;
         private DataOutputStream dataOut;
@@ -78,23 +88,6 @@ public class Player {
                 System.out.println("Connected to server as player number " + playerID);
             } catch (IOException ex) {
                 System.out.println("IO Exception from CSC constructor");
-            }
-        }
-
-        public void setPlayersNumber() {
-            try {
-                Scanner keyboard = new Scanner(System.in);
-                System.out.println(dataIn.readUTF());
-                int playerNum = 0;
-                while( playerNum != 2 && playerNum != 4 ) {
-                    playerNum = keyboard.nextInt();
-                    if( playerNum != 2 && playerNum != 4 )
-                        System.out.println("Error. Please select 2 or 4 players");
-                }
-                dataOut.writeInt(playerNum);
-                dataOut.flush();
-            } catch (IOException ex) {
-                System.out.println("IOException from setPlayerNum() CSC");
             }
         }
 
@@ -140,10 +133,6 @@ public class Player {
         Menu menu = new Menu();
         Controller controller = new Controller(player, menu);
         controller.initController();
-        player.connectToServer();
-        if(player.playerID == 1) {
-            player.csc.setPlayersNumber();
-        }
         // TODO frameController.obtainData(p);
         // TODO p <- action (draw/play 1 card/play multiple cards)
         // TODO communicate with server

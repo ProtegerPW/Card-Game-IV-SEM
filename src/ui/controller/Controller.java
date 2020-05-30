@@ -33,14 +33,17 @@ public class Controller {
 
     private class PlayButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            if(1 == player.getPlayerID()) {
+            player.connectToServer();
+            if(player.getPlayerID() == -1)
+                return;
+            if(player.getPlayerID() == 1) {
                 gameSetup = new GameSetup();
                 gameSetup.showGameSetupWindow();
                 initGameSetupListeners();
             }
             else {
                 gameView = new GameView();
-                gameView.showGameFrameWindow();
+                gameView.showGameWindow();
                 menu.closeMenu();
             }
         }
@@ -63,7 +66,11 @@ public class Controller {
         public void actionPerformed(ActionEvent actionEvent) {
             JButton b = (JButton) actionEvent.getSource();
             int numPlayers = Integer.parseInt(b.getText());
-            player.getCsc().setPlayersNumber(numPlayers);
+            player.setPlayersNumber(numPlayers);
+            gameView = new GameView();
+            gameView.showGameWindow();
+            gameSetup.dispose();
+            menu.dispose();
         }
     }
 }

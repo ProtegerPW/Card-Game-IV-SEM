@@ -30,7 +30,7 @@ public class GameView extends JFrame {
         return opponentHand;
     }
 
-    public void showGameFrameWindow() {
+    public void showGameWindow() {
         this.setVisible(true);
     }
 }

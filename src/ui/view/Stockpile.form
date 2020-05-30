@@ -8,12 +8,12 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="5e60" class="javax.swing.JLabel" binding="stos">
+      <component id="5e60" class="javax.swing.JLabel" binding="sztos">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="STOS"/>
+          <text value="SZTOS"/>
         </properties>
       </component>
     </children>

@@ -19,7 +19,7 @@ public class Player {
     private int playerID;
     private int turn;
     private boolean buttonsEnable;
-    private ArrayList<ArrayList<Integer>> handOfCards;
+    private ArrayList<PanCard> handOfCards;
     private ArrayList<PanCard> stockpile;
     private PanCard topCard;
     private int[] cardCount;
@@ -28,7 +28,7 @@ public class Player {
 
     public Player() {
         playerID = -1;
-        handOfCards = new ArrayList<ArrayList<Integer>>();
+        handOfCards = new ArrayList<PanCard>();
     }
 
     public int getPlayerID() {
@@ -97,9 +97,9 @@ public class Player {
                 System.out.println("number of cards " + cardNumber );
                 initCardCount(cardNumber);
                 for(int i = 0; i < cardNumber; i++) {
-                    ArrayList<Integer> cardBuffer = new ArrayList<Integer>();
-                    cardBuffer.add(dataIn.readInt());
-                    cardBuffer.add(dataIn.readInt());
+                    int color = dataIn.readInt();
+                    int value = dataIn.readInt();
+                    PanCard cardBuffer = new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value));
                     handOfCards.add(cardBuffer);
 //                    cardBuf[0] = dataIn.readInt();
 //                    cardBuf[1] = dataIn.readInt();
@@ -111,7 +111,7 @@ public class Player {
                 PanCard.sortTable(handOfCards);
 
                 for(int i = 0; i < cardNumber; i++) {
-                    System.out.println(handOfCards.get(i).get(0) + " " + handOfCards.get(i).get(1));
+                    System.out.println(handOfCards.get(i).getColorInt() + " " + handOfCards.get(i).getValueInt());
                 }
                 TimeUnit.SECONDS.sleep(20);
 
@@ -132,7 +132,7 @@ public class Player {
         if(checkCardIsValid(card)) {
             int multipleCards = 0;
             for(int i = 0; i < handOfCards.size(); i++) {
-                if(card.getValueInt() == handOfCards.get(i).get(1)) {
+                if(card.getValueInt() == handOfCards.get(i).getValueInt()) {
                     multipleCards++;
                 }
             }
@@ -152,16 +152,8 @@ public class Player {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 
-    public void deleteCardFromHand(int color, int value) {
-        for(int i = 0; i < handOfCards.size(); i++) {
-            if(handOfCards.get(i).get(0) == color) {
-                if(handOfCards.get(i).get(1) == value) {
-                    handOfCards.remove(i);
-                    break;
-                }
-            }
-        }
-
+    public void deleteCardFromHand(PanCard card) {
+        if(handOfCards.contains(card)) handOfCards.remove(card);
     }
 
     public void sendAndDeleteCard(String text, ArrayList<PanCard> cards) {
@@ -169,12 +161,12 @@ public class Player {
             csc.dataOut.writeUTF(text);
             csc.dataOut.writeInt(cards.size());
             //eventually add csc.dataOut.flush();
-            for(int i = 0; i <= cards.size() - 1; i++) {
+            for(int i = 0; i < cards.size(); i++) {
                 int color = cards.get(i).getColorInt();
                 int value = cards.get(i).getValueInt();
                 csc.dataOut.writeInt(color);
                 csc.dataOut.writeInt(value);
-                deleteCardFromHand(color, value);
+                deleteCardFromHand(cards.get(i));
             }
             csc.dataOut.flush();
         } catch(IOException ex) {
@@ -195,12 +187,11 @@ public class Player {
                     csc.dataOut.writeUTF(text);
                     csc.dataOut.flush();
                     int numOfDrawCards = csc.dataIn.readInt();
-                    ArrayList<Integer> tempListOfCards;
                     for(int i = 0; i < numOfDrawCards; i++) {
-                        tempListOfCards = new ArrayList<Integer>();
-                        tempListOfCards.add(csc.dataIn.readInt());
-                        tempListOfCards.add(csc.dataIn.readInt());
-                        handOfCards.add(tempListOfCards);
+                        color = csc.dataIn.readInt();
+                        value = csc.dataIn.readInt();
+                        PanCard tempListOfCard = new PanCard(PanCard.Color.getColor(color),PanCard.Value.getValue(value));
+                        handOfCards.add(tempListOfCard);
                     }
                     PanCard.sortTable(handOfCards);
                     break;

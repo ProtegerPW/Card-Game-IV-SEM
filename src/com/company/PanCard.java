@@ -101,19 +101,62 @@ public class PanCard {
         return color + "_" + value;
     }
 
-    public static void sortTable (ArrayList<ArrayList<Integer>> cardTable) {
-        Collections.sort(cardTable, new Comparator<ArrayList<Integer>>() {
-            @Override
-            public int compare(ArrayList<Integer> firstCard, ArrayList<Integer> secondCard) {
-                Integer colorCompare = firstCard.get(0).compareTo(secondCard.get(0));
-                Integer cardCompare = firstCard.get(1).compareTo(secondCard.get(1));
+//    public static Comparator<PanCard> PanCardComparator = new Comparator<PanCard>() {
+//
+//        public int compare(PanCard s1, PanCard s2) {
+//            Integer[] first = {s1.getColorInt(), s1.getValueInt()};
+//            Integer[] second = {s2.getColorInt(), s2.getValueInt()};
+//            int colorCompare = first[0].compareTo(second[0]);
+//            int valueCompare = first[1].compareTo(second[1]);
+//
+//            if (valueCompare == 0) {
+//                return ((colorCompare == 0) ? valueCompare : colorCompare);
+//            } else {
+//                return valueCompare;
+//            }
+//        }
+//
+//
+//            //ascending order
+//            return StudentName1.compareTo(StudentName2);
+//
+//            //descending order
+//            //return StudentName2.compareTo(StudentName1);
+//        }};
 
-                if (cardCompare == 0) {
-                    return ((colorCompare == 0) ? cardCompare : colorCompare);
+    public static void sortTable (ArrayList<PanCard> cardTable) {
+
+        Collections.sort(cardTable, new Comparator<PanCard>() {
+            @Override
+            public int compare(PanCard s1, PanCard s2) {
+                Integer[] first = {s1.getColorInt(), s1.getValueInt()};
+                Integer[] second = {s2.getColorInt(), s2.getValueInt()};
+                int colorCompare = first[0].compareTo(second[0]);
+                int valueCompare = first[1].compareTo(second[1]);
+
+                if (valueCompare == 0) {
+                return ((colorCompare == 0) ? valueCompare : colorCompare);
                 } else {
-                    return cardCompare;
+                return valueCompare;
                 }
             }
         });
     }
+
+
+//    public static void sortTable (ArrayList<ArrayList<Integer>> cardTable) {
+//        Collections.sort(cardTable, new Comparator<ArrayList<Integer>>() {
+//            @Override
+//            public int compare(ArrayList<Integer> firstCard, ArrayList<Integer> secondCard) {
+//                Integer colorCompare = firstCard.get(0).compareTo(secondCard.get(0));
+//                Integer cardCompare = firstCard.get(1).compareTo(secondCard.get(1));
+//
+//                if (cardCompare == 0) {
+//                    return ((colorCompare == 0) ? cardCompare : colorCompare);
+//                } else {
+//                    return cardCompare;
+//                }
+//            }
+//        });
+//    }
 }

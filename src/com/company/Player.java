@@ -132,9 +132,10 @@ public class Player {
         // draw = true;
     // player.drawCards();
 
-    // TODO private bool selectedCard(PanCard card); true -> można rzucić więcej; false -> ruch zakończony
-    // bool turn = player.selectedCard(card);
-    // if(turn) ...W
+    // TODO private bool selectedCard(PanCard card); true -> może zrobić więcej; false -> nie może zrobić więcej - ruch zakończony
+    // if(player.selectedCard(card)) player.getMultipleCards(ArrayList<PanCard>);
+    // canPlay(card); true -> rzuć, false -> nic nie rób
+
 
     public static void main(String[] args) {
         Player player = new Player();

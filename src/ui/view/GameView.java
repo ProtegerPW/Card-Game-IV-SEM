@@ -1,36 +1,39 @@
 package ui.view;
 
+import com.company.PanCard;
+import com.company.Player;
+
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class GameView extends JFrame {
     private JPanel mainGamePanel;
-    private JButton playerCard0;
-    private JButton opponentCard0;
-
-    private ArrayList<JButton> playerHand;
-    private ArrayList<JButton> opponentHand;
+    private JPanel playerHand;
+    private JPanel opponentHand2;
+    private JPanel opponentHand1;
+    private JPanel opponentHand3;
+    private JPanel stockpile;
 
     public GameView() {
-        playerHand = new ArrayList<JButton>();
-        opponentHand = new ArrayList<JButton>();
         setSize(1260, 720);
         setContentPane(mainGamePanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }
 
-    public ArrayList<JButton> getPlayerHand() {
-        playerHand.add(playerCard0);
-        return playerHand;
-    }
-
-    public ArrayList<JButton> getOpponentHand() {
-        opponentHand.add(opponentCard0);
-        return opponentHand;
-    }
-
     public void showGameWindow() {
-        this.setVisible(true);
+        pack();
+        setVisible(true);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+        playerHand = new PlayerHand().getPlayerHand();
+        opponentHand1 = new OpponentHandVertical().getPanel();
+        opponentHand2 = new OpponentHandHorizontal().getPanel();
+        opponentHand3 = new OpponentHandVertical().getPanel();
+        stockpile = new Stockpile().getPanel();
     }
 }

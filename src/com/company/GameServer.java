@@ -48,7 +48,6 @@ public class GameServer {
             try {
                 ssc.dataOut.writeInt(1);
                 ssc.dataOut.flush();
-                ssc.dataOut.writeUTF("Type number of players");
                 numPlayers = ssc.dataIn.readInt();
                 System.out.println("Number of players is " + numPlayers);
             } catch (IOException ex) {
@@ -57,6 +56,7 @@ public class GameServer {
             for(int i = 0; i < numPlayers; i++) {
                 ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
                 playerHand.add(hand);
+                System.out.println("Created hand #" + (i + 1));
             }
             numConPlayers++;
             Thread t = new Thread(ssc);

@@ -1,5 +1,6 @@
 package ui.controller;
 
+import com.company.ClientSideConnection;
 import com.company.PanCard;
 import com.company.Player;
 import ui.view.GameSetup;
@@ -12,43 +13,43 @@ import java.awt.event.*;
 
 public class Controller {
     private Player player;
+    private ClientSideConnection clientSideConnection;
     //
     private Menu menu;
     private GameSetup gameSetup;
     private GameView gameView;
 
-    public Controller(Player p, Menu menu) {
-        player = p;
+    public Controller(Player player, ClientSideConnection clientSideConnection, Menu menu) {
+        this.player = player;
+        this.clientSideConnection = clientSideConnection;
         this.menu = menu;
     }
 
-    public void initController() {
+        // display menu frame, create listeners for menu
+    public void displayMenu() {
         menu.showMenuWindow();
-        initMenuListeners();
-    }
-
-    private void initMenuListeners() {
         menu.getPlayButton().addActionListener(new Controller.PlayButtonListener());
         menu.getExitButton().addActionListener(new Controller.ExitButtonListener());
     }
-
+        // if playerID == 1 -> open game setup, otherwise -> open main game frame
     private class PlayButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            player.connectToServer();
-            if(player.getPlayerID() == -1)
+            clientSideConnection.connectToServer();
+            if(player.getPlayerID() == -1)      // connection unsuccessful
                 return;
-            initGameView();
-            if(player.getPlayerID() == 1) {
+            if(player.getPlayerID() == 1) {     // playerID == 1
                 initGameSetup();
-                initGameSetupListeners();
             }
             else {
-                gameView.showGameWindow();
+                initGameView();
                 menu.closeMenu();
+                //
+                clientSideConnection.readCards();
+                //gameView.setHand(player.getHandOfCards());
             }
         }
     }
-
+        // if player chooses exit -> close game
     private class ExitButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             System.exit(0);
@@ -57,32 +58,36 @@ public class Controller {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // display game setup frame -> first player chooses number of players
     private void initGameSetup() {
         gameSetup = new GameSetup();
         gameSetup.showGameSetupWindow();
-    }
-
-    private void initGameSetupListeners() {
         gameSetup.getButton2().addActionListener(new Controller.NumPlayerListener());
         gameSetup.getButton4().addActionListener(new Controller.NumPlayerListener());
     }
 
+        // listener for 2 options in game setup frame - select 2 or 4 players
     private class NumPlayerListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             JButton b = (JButton) actionEvent.getSource();
             int numPlayers = Integer.parseInt(b.getText());
-            player.setPlayersNumber(numPlayers);
-            gameView.showGameWindow();
-            gameSetup.dispose();
-            menu.dispose();
+            clientSideConnection.setPlayersNumber(numPlayers);  // send selected player number to server
+            System.out.println(numPlayers);
+            initGameView();                                     // display game frame
+            gameSetup.dispose();                                //
+            menu.dispose();                                     // close other windows
+            //
+            clientSideConnection.readCards();
+            //gameView.setHand(player.getHandOfCards());
         }
     }
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // display game frame, create listener for player hand
     private void initGameView() {
         gameView = new GameView();
-        gameView.setHand(player.getHandOfCards());
+        gameView.showGameWindow();
         gameView.playerHand.addMouseListener(new PlayerHandListener());
     }
 

@@ -35,8 +35,8 @@ public class PanCard {
     public PanCard(final Color color, final Value value) {
         this.color = color;
         this.value = value;
-        this.colorInt = getColorInt();
-        this.valueInt = getValueInt();
+        this.colorInt = returnColorInt();
+        this.valueInt = returnValueInt();
     }
 
     public Color getColor() {
@@ -44,6 +44,10 @@ public class PanCard {
     }
 
     public int getColorInt() {
+        return this.colorInt;
+    }
+
+    public int returnColorInt() {
         int colorNum;
         String colorName = this.color.toString();
         switch (colorName) {
@@ -70,6 +74,10 @@ public class PanCard {
     }
 
     public int getValueInt() {
+        return this.valueInt;
+    }
+
+    public int returnValueInt() {
         int valueNum;
         String valueName = this.value.toString();
         switch (valueName) {
@@ -104,8 +112,8 @@ public class PanCard {
 //    public static Comparator<PanCard> PanCardComparator = new Comparator<PanCard>() {
 //
 //        public int compare(PanCard s1, PanCard s2) {
-//            Integer[] first = {s1.getColorInt(), s1.getValueInt()};
-//            Integer[] second = {s2.getColorInt(), s2.getValueInt()};
+//            Integer[] first = {s1.returnColorInt(), s1.returnValueInt()};
+//            Integer[] second = {s2.returnColorInt(), s2.returnValueInt()};
 //            int colorCompare = first[0].compareTo(second[0]);
 //            int valueCompare = first[1].compareTo(second[1]);
 //

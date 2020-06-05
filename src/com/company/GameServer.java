@@ -121,14 +121,16 @@ public class GameServer {
             if(playerHand.get(playerID - 1).contains(card)) playerHand.remove(card);
         }
 
-        public void drawCard(int numOfCards) {
+        public void drawCard(int playerID, int numOfCards) {
             try {
                 for (int i = 0; i < numOfCards; i++) {
                     dataOut.writeInt(stockpile.get(stockpile.size() - 1).getColorInt());
                     dataOut.writeInt(stockpile.get(stockpile.size() - 1).getValueInt());
+                    playerHand.get(playerID - 1).add(stockpile.get(stockpile))
                     stockpile.remove(stockpile.size() - 1);
                 }
                 dataOut.flush();
+                updateStatus(playerID, -1);
             } catch (IOException ex) {
                 System.out.println("IOException from drawCard() ");
             }
@@ -148,6 +150,7 @@ public class GameServer {
                     deleteCardFromHand(tempCard, playerID);
                     addCardToStockpile(tempCard);
                 }
+                updateStatus(playerID, numOfCards);
             } catch(IOException ex) {
                 System.out.println("IOException from readAndUpdateCardStatus() ");
             }
@@ -172,11 +175,35 @@ public class GameServer {
                         }
                         dataOut.writeInt(tempStockSize);
                         dataOut.flush();
-                        drawCard(tempStockSize);
+                        drawCard(playerID, tempStockSize);
                         break;
                 }
             }catch (IOException ex) {
                 System.out.println("IOException from performOperation() ");
+            }
+        }
+
+        public void sendCurrentStockpile(int numOfCards) {
+            try{
+                if(numOfCards < 0) { //if there is a draw operation server doesn`t need to send new cards
+                    dataOut.writeInt(-1);
+                } else {
+                    dataOut.writeInt(numOfCards);
+                    for(int i = numOfCards; i > 0; i--) {
+                        dataOut.writeInt(stockpile.get(stockpile.size() - i).getColorInt());
+                        dataOut.writeInt(stockpile.get(stockpile.size() - i).getValueInt());
+                    }
+                }
+                dataOut.flush();
+            } catch (IOException ex) {
+                System.out.println(" IOException from sendCurrentStockpile() ");
+            }
+        }
+
+        public void updateStatus(int playerID, int numOfCards) {
+            for(int i = 0; i < numConPlayers; i++) {
+                if(i == playerID) continue;
+                players[i].sendCurrentStockpile(numOfCards);
             }
         }
 
@@ -200,7 +227,7 @@ public class GameServer {
                 dataOut.writeInt(playerFlag);
                 dataOut.flush();
 
-                while(true) { //TODO send players number of cards of theri opponents
+                while(true) { //TODO send players number of cards of their opponents
                             //TODO send player new stockpile
                     if(playerID == 1) {
                         String readText = dataIn.readUTF();

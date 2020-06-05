@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class Player {
     //part for player info
     private int playerID;
+    private int currentPlayer;
     private int turn;
     private boolean buttonsEnable;
     private ArrayList<PanCard> handOfCards;
@@ -153,7 +154,7 @@ public class Player {
     }
 
     public void deleteCardFromHand(PanCard card) {
-        if(handOfCards.contains(card)) handOfCards.remove(card);
+        handOfCards.remove(card);
     }
 
     public void sendAndDeleteCard(String text, ArrayList<PanCard> cards) {
@@ -161,12 +162,10 @@ public class Player {
             csc.dataOut.writeUTF(text);
             csc.dataOut.writeInt(cards.size());
             //eventually add csc.dataOut.flush();
-            for(int i = 0; i < cards.size(); i++) {
-                int color = cards.get(i).getColorInt();
-                int value = cards.get(i).getValueInt();
-                csc.dataOut.writeInt(color);
-                csc.dataOut.writeInt(value);
-                deleteCardFromHand(cards.get(i));
+            for (PanCard card : cards) {
+                csc.dataOut.writeInt(card.getColorInt());
+                csc.dataOut.writeInt(card.getValueInt());
+                deleteCardFromHand(card);
             }
             csc.dataOut.flush();
         } catch(IOException ex) {
@@ -174,10 +173,36 @@ public class Player {
         }
     }
 
+    public PanCard readCard() {
+        PanCard tempCard = new PanCard(PanCard.Color.getColor(0),PanCard.Value.getValue(0));
+        try {
+            return new PanCard(PanCard.Color.getColor(csc.dataIn.readInt()), PanCard.Value.getValue(csc.dataIn.readInt()));
+        } catch (IOException ex) {
+            System.out.println(" IOException from readCard() ");
+        }
+        return tempCard;
+    }
+
+    public void receiveUpdate() {
+        try {
+            int numOfCards = csc.dataIn.readInt(); //if numOfCards == -1 it means the opponent draw cards
+            if(numOfCards < 0) {
+                for(int i = 0; i < 3; i++) {
+                    if(stockpile.size() == 1) break;
+                    stockpile.remove(stockpile.size() - 1);
+                }
+            } else {
+                for(int i = 0; i < numOfCards; i++) {
+                  stockpile.add(readCard());
+                }
+            }
+        } catch(IOException ex) {
+            System.out.println(" IOException from receiveUpdate() ");
+        }
+    }
+
     public void sendCommunicate(String text, ArrayList<PanCard> cards) {
         try {
-            int color = 0;
-            int value = 0;
             switch(text) {
                 case "addCards":
                     sendAndDeleteCard(text, cards);
@@ -188,8 +213,8 @@ public class Player {
                     csc.dataOut.flush();
                     int numOfDrawCards = csc.dataIn.readInt();
                     for(int i = 0; i < numOfDrawCards; i++) {
-                        color = csc.dataIn.readInt();
-                        value = csc.dataIn.readInt();
+                        int color = csc.dataIn.readInt();
+                        int value = csc.dataIn.readInt();
                         PanCard tempListOfCard = new PanCard(PanCard.Color.getColor(color),PanCard.Value.getValue(value));
                         handOfCards.add(tempListOfCard);
                     }

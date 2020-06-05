@@ -126,7 +126,7 @@ public class GameServer {
                 for (int i = 0; i < numOfCards; i++) {
                     dataOut.writeInt(stockpile.get(stockpile.size() - 1).getColorInt());
                     dataOut.writeInt(stockpile.get(stockpile.size() - 1).getValueInt());
-                    playerHand.get(playerID - 1).add(stockpile.get(stockpile))
+                    playerHand.get(playerID - 1).add(stockpile.get(stockpile.size() - 1));
                     stockpile.remove(stockpile.size() - 1);
                 }
                 dataOut.flush();

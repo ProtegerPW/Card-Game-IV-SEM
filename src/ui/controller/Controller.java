@@ -1,13 +1,14 @@
 package ui.controller;
 
+import com.company.PanCard;
 import com.company.Player;
 import ui.view.GameSetup;
 import ui.view.GameView;
 import ui.view.Menu;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 
 public class Controller {
     private Player player;
@@ -36,13 +37,12 @@ public class Controller {
             player.connectToServer();
             if(player.getPlayerID() == -1)
                 return;
+            initGameView();
             if(player.getPlayerID() == 1) {
-                gameSetup = new GameSetup();
-                gameSetup.showGameSetupWindow();
+                initGameSetup();
                 initGameSetupListeners();
             }
             else {
-                gameView = new GameView();
                 gameView.showGameWindow();
                 menu.closeMenu();
             }
@@ -57,6 +57,11 @@ public class Controller {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+    private void initGameSetup() {
+        gameSetup = new GameSetup();
+        gameSetup.showGameSetupWindow();
+    }
+
     private void initGameSetupListeners() {
         gameSetup.getButton2().addActionListener(new Controller.NumPlayerListener());
         gameSetup.getButton4().addActionListener(new Controller.NumPlayerListener());
@@ -67,7 +72,6 @@ public class Controller {
             JButton b = (JButton) actionEvent.getSource();
             int numPlayers = Integer.parseInt(b.getText());
             player.setPlayersNumber(numPlayers);
-            gameView = new GameView();
             gameView.showGameWindow();
             gameSetup.dispose();
             menu.dispose();
@@ -76,5 +80,31 @@ public class Controller {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+    private void initGameView() {
+        gameView = new GameView();
+        gameView.setHand(player.getHandOfCards());
+        gameView.playerHand.addMouseListener(new PlayerHandListener());
+    }
 
+    public class PlayerHandListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            System.out.println( "Clicked" );
+            PanCard selected = player.getSelectedCard();
+            if (selected != null) {
+                Rectangle bounds = gameView.getMapCards().get(selected);
+                bounds.y += 20;
+                gameView.playerHand.repaint();
+            }
+            for(PanCard card: player.getHandOfCards()) {
+                Rectangle bounds = gameView.getMapCards().get(card);
+                if(bounds.contains(e.getPoint())) {
+                    player.setSelectedCard(card);
+                    bounds.y -= 20;
+                    gameView.playerHand.repaint();
+                    break;
+                }
+            }
+        }
+    }
 }

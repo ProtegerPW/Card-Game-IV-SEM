@@ -20,9 +20,10 @@ public class Player {
     private int turn;
     private boolean buttonsEnable;
     private ArrayList<PanCard> handOfCards;
+    private int[] cardCount;
+    private PanCard selectedCard;
     private ArrayList<PanCard> stockpile;
     private PanCard topCard;
-    private int[] cardCount;
 
     private ClientSideConnection csc;
 
@@ -37,6 +38,22 @@ public class Player {
 
     public void setPlayerID(int playerID) {
         this.playerID = playerID;
+    }
+
+    public ArrayList<PanCard> getHandOfCards() {
+        return handOfCards;
+    }
+
+    public void setHandOfCards(ArrayList<PanCard> handOfCards) {
+        this.handOfCards = handOfCards;
+    }
+
+    public PanCard getSelectedCard() {
+        return selectedCard;
+    }
+
+    public void setSelectedCard(PanCard selectedCard) {
+        this.selectedCard = selectedCard;
     }
 
     public ClientSideConnection getCsc() {

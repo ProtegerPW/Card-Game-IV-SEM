@@ -1,20 +1,24 @@
 package ui.view;
 
 import com.company.PanCard;
-import com.company.Player;
+import com.company.PanDeck;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GameView extends JFrame {
     private JPanel mainGamePanel;
-    private JPanel playerHand;
-    private JPanel opponentHand1;
-    private JPanel opponentHand2;
-    private JPanel opponentHand3;
-    private JPanel stockpile;
+    public JPanel playerHand;
+    public JPanel opponentHand1;
+    public JPanel opponentHand2;
+    public JPanel opponentHand3;
+    public JPanel stockpile;
+
+    private ArrayList<PanCard> hand;
+    private Map<PanCard, Rectangle> mapCards;
 
     public GameView() {
         setSize(1280, 720);
@@ -23,56 +27,83 @@ public class GameView extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    public JPanel getPlayerHand() {
-        return playerHand;
-    }
-
-    public void setPlayerHand(JPanel playerHand) {
-        this.playerHand = playerHand;
-    }
-
-    public JPanel getOpponentHand1() {
-        return opponentHand1;
-    }
-
-    public void setOpponentHand1(JPanel opponentHand1) {
-        this.opponentHand1 = opponentHand1;
-    }
-
-    public JPanel getOpponentHand2() {
-        return opponentHand2;
-    }
-
-    public void setOpponentHand2(JPanel opponentHand2) {
-        this.opponentHand2 = opponentHand2;
-    }
-
-    public JPanel getOpponentHand3() {
-        return opponentHand3;
-    }
-
-    public void setOpponentHand3(JPanel opponentHand3) {
-        this.opponentHand3 = opponentHand3;
-    }
-
-    public JPanel getStockpile() {
-        return stockpile;
-    }
-
-    public void setStockpile(JPanel stockpile) {
-        this.stockpile = stockpile;
+    private void createUIComponents() {
+        playerHand = new PlayerHand();
+        opponentHand1 = new OpponentHandVertical();
+        opponentHand2 = new OpponentHandHorizontal();
+        opponentHand3 = new OpponentHandVertical();
+        stockpile = new Stockpile().getPanel();
     }
 
     public void showGameWindow() {
         setVisible(true);
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-        playerHand = new PlayerHand();
-        opponentHand1 = new OpponentHandVertical();
-        opponentHand2 = new OpponentHandHorizontal();
-        opponentHand3 = new OpponentHandVertical();
-        stockpile = new Stockpile().getPanel();
+    public ArrayList<PanCard> getHand() {
+        return hand;
+    }
+
+    public void setHand(ArrayList<PanCard> hand) {
+        this.hand = hand;
+        for(PanCard card: hand)
+            System.out.println(card);
+    }
+
+    public Map<PanCard, Rectangle> getMapCards() {
+        return mapCards;
+    }
+
+    public void setMapCards(Map<PanCard, Rectangle> mapCards) {
+        this.mapCards = mapCards;
+    }
+
+    public class PlayerHand extends JPanel {
+        public PlayerHand() {
+            mapCards = new HashMap<>(5);
+            setSize(-1, 150);
+            setPreferredSize(new Dimension(-1,150));
+            setMaximumSize(new Dimension(-1,200));
+            setBackground(Color.CYAN);
+        }
+
+        @Override
+        public void invalidate() {
+            super.invalidate();
+            mapCards.clear();
+            int cardHeight = (getHeight() - 20) / 3;
+            int cardWidth = (int) (cardHeight * 0.6);
+            int xDelta = cardWidth / 2;
+            int xPos = (int) ((getWidth() / 2) - (cardWidth * (hand.size() / 4.0)));
+            int yPos = (getHeight() - 20) - cardHeight;
+            for (PanCard card: hand) {
+                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
+                mapCards.put(card, bounds);
+                xPos += xDelta;
+            }
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            for(PanCard card: hand) {
+                Rectangle bounds = mapCards.get(card);
+                System.out.println(bounds);
+                if (bounds != null) {
+                    g2d.setColor(Color.WHITE);
+                    g2d.fill(bounds);
+                    g2d.setColor(Color.BLACK);
+                    g2d.draw(bounds);
+                    Graphics2D copy = (Graphics2D) g2d.create();
+                    paintCard(copy, card, bounds);
+                    copy.dispose();
+                }
+            }
+            g2d.dispose();
+        }
+
+        protected void paintCard(Graphics2D g2d, PanCard card, Rectangle bounds) {
+            g2d.translate(bounds.x + 5, bounds.y + 5);
+            g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
+        }
     }
 }

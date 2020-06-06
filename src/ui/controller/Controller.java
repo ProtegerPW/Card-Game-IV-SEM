@@ -95,13 +95,13 @@ public class Controller {
             System.out.println( "Clicked" );
             PanCard selected = player.getSelectedCard();
             if (selected != null) {
-                Rectangle bounds = gameView.getMapCards().get(selected);
+                Rectangle bounds = gameView.getMapPlayerHand().get(selected);
                 bounds.y += 20;
                  gameView.playerHand.repaint();
             }
             player.setSelectedCard(null);
             for(PanCard card: player.getReversedHandOfCards()) {
-                Rectangle bounds = gameView.getMapCards().get(card);
+                Rectangle bounds = gameView.getMapPlayerHand().get(card);
                 if(bounds.contains(e.getPoint())) {
                     player.setSelectedCard(card);
                     bounds.y -= 20;

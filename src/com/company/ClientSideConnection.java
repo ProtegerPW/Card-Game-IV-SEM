@@ -102,7 +102,7 @@ public class ClientSideConnection {
                     player.changeCardCount(player.getCurrentPlayer(), numOfCards);
                 }
             }
-            player.setCurrentPlayer(player.lastColorOnStockpile());
+            player.setNextPlayer(player.lastColorOnStockpile());
         } catch(IOException ex) {
             System.out.println(" IOException from receiveUpdate() ");
         }

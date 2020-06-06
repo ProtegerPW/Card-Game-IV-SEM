@@ -26,24 +26,22 @@ public class Player {
     private int[] cardCount;
     private PanCard selectedCard;
     private ArrayList<PanCard> stockpile;
-    private PanCard topCard;
+    private PanCard topCard; //TODO delete this argument - is redundant
 
     public Player() {
         playerID = -1;
         handOfCards = new ArrayList<PanCard>();
     }
 
-    public int getPlayerID() {
-        return playerID;
-    }
+    public int getPlayerID() { return playerID; }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
-    }
+    public void setPlayerID(int playerID) { this.playerID = playerID; }
 
     public int getCurrentPlayer() { return currentPlayer; }
 
-    public void setCurrentPlayer(int isClubOnTop) {
+    public void setCurrentPlayer(int numOfPlayer) { this.currentPlayer = numOfPlayer;}
+
+    public void setNextPlayer(int isClubOnTop) {
         if(isClubOnTop == 1) {
             if(currentPlayer == 1) {
                 currentPlayer = cardCount.length;
@@ -59,33 +57,19 @@ public class Player {
         }
     }
 
-    public ArrayList<PanCard> getHandOfCards() {
-        return handOfCards;
-    }
+    public ArrayList<PanCard> getHandOfCards() { return handOfCards; }
 
-    public void setHandOfCards(ArrayList<PanCard> handOfCards) {
-        this.handOfCards = handOfCards;
-    }
+    public void setHandOfCards(ArrayList<PanCard> handOfCards) { this.handOfCards = handOfCards; }
 
-    public int[] getCardCount() {
-        return cardCount;
-    }
+    public int[] getCardCount() { return cardCount; }
 
-    public void setCardCount(int[] cardCount) {
-        this.cardCount = cardCount;
-    }
+    public void setCardCount(int[] cardCount) { this.cardCount = cardCount; }
 
-    public PanCard getSelectedCard() {
-        return selectedCard;
-    }
+    public PanCard getSelectedCard() { return selectedCard; }
 
-    public void setSelectedCard(PanCard selectedCard) {
-        this.selectedCard = selectedCard;
-    }
+    public void setSelectedCard(PanCard selectedCard) { this.selectedCard = selectedCard; }
 
-    public void setTopCard(PanCard topCard) {
-        this.topCard = topCard;
-    }
+    public void setTopCard(PanCard topCard) { this.topCard = topCard; }
 
     public void initCardCount(int cardNumber) {
         if(6 == cardNumber)
@@ -102,13 +86,9 @@ public class Player {
         }
     }
 
-    public void addCardToHand(PanCard card) {
-        handOfCards.add(card);
-    }
+    public void addCardToHand(PanCard card) { handOfCards.add(card); }
 
-    public void sortHand() {
-        PanCard.sortTable(handOfCards);
-    }
+    public void sortHand() { PanCard.sortTable(handOfCards); }
 
     public void printHand() {
         for(int i = 0; i < cardCount[playerID - 1]; i++) {
@@ -116,7 +96,7 @@ public class Player {
         }
     }
 
-    public boolean checkMultiCard(PanCard card) {
+    public boolean checkMultiCard(PanCard card) { //TODO implement & check this method
         if(checkCardIsValid(card)) {
             int multipleCards = 0;
             for(int i = 0; i < handOfCards.size(); i++) {
@@ -136,17 +116,11 @@ public class Player {
         }
     }
 
-    public int getStockpileSize() {
-        return stockpile.size();
-    }
+    public int getStockpileSize() { return stockpile.size(); }
 
-    public void popStockpile() {
-        stockpile.remove(stockpile.size() - 1);
-    }
+    public void popStockpile() { stockpile.remove(stockpile.size() - 1); }
 
-    public void pushStockpile(PanCard card) {
-        stockpile.add(card);
-    }
+    public void pushStockpile(PanCard card) { stockpile.add(card); }
 
     public boolean checkCardIsValid(PanCard card) {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
@@ -160,9 +134,7 @@ public class Player {
         }
     }
 
-    public void deleteCardFromHand(PanCard card) {
-        handOfCards.remove(card);
-    }
+    public void deleteCardFromHand(PanCard card) { handOfCards.remove(card); }
 
     // TODO private void drawCards();
         // draw = true;

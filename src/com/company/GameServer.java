@@ -38,7 +38,7 @@ public class GameServer {
         }
     }
 
-    public void waitForHost() {
+    public void waitForHost() {         //waiting for first player to join
         try {
             System.out.println("Waiting for host...");
             Socket s = ss.accept();
@@ -46,21 +46,22 @@ public class GameServer {
             ServerSideConnection ssc = new ServerSideConnection(s, 1);
             players[0] = ssc;
             try {
-                ssc.dataOut.writeInt(1);
+                ssc.dataOut.writeInt(1);        //send playerID to connected player
                 ssc.dataOut.flush();
                 ssc.dataOut.writeUTF("Type number of players");
-                numPlayers = ssc.dataIn.readInt();
+                numPlayers = ssc.dataIn.readInt();      //read number of sent players
                 System.out.println("Number of players is " + numPlayers);
             } catch (IOException ex) {
                 System.out.println("IOException from input Player number");
             }
             for(int i = 0; i < numPlayers; i++) {
+                //for loop to divide cards into num of players
                 ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
                 playerHand.add(hand);
             }
             numConPlayers++;
             Thread t = new Thread(ssc);
-            t.start();
+            t.start();          //start thread for first connected player
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections");
         }
@@ -69,7 +70,7 @@ public class GameServer {
     public void acceptConnections() {
         try {
             System.out.println("Waiting for connections ...");
-            while (numConPlayers != numPlayers) {
+            while (numConPlayers != numPlayers) {       //waiting for other player to join
                 Socket s = ss.accept();
                 numConPlayers++;
                 System.out.println("Player #" + numConPlayers + " has connected");
@@ -117,6 +118,7 @@ public class GameServer {
             }
         }
 
+        //delete only one card from player hand based on playerID
         public void deleteCardFromHand(PanCard card, int playerID) {
             if(playerHand.get(playerID - 1).contains(card)) playerHand.remove(card);
         }
@@ -185,7 +187,7 @@ public class GameServer {
 
         public void sendCurrentStockpile(int numOfCards) {
             try{
-                if(numOfCards < 0) { //if there is a draw operation server doesn`t need to send new cards
+                if(numOfCards < 0) { //if there is a draw operation (-1) server doesn`t need to send new cards
                     dataOut.writeInt(-1);
                 } else {
                     dataOut.writeInt(numOfCards);

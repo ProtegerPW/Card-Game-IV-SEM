@@ -47,6 +47,14 @@ public class Player {
         this.handOfCards = handOfCards;
     }
 
+    public int[] getCardCount() {
+        return cardCount;
+    }
+
+    public void setCardCount(int[] cardCount) {
+        this.cardCount = cardCount;
+    }
+
     public PanCard getSelectedCard() {
         return selectedCard;
     }

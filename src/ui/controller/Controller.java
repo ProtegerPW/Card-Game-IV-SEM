@@ -31,6 +31,7 @@ public class Controller {
         menu.getPlayButton().addActionListener(new Controller.PlayButtonListener());
         menu.getExitButton().addActionListener(new Controller.ExitButtonListener());
     }
+
         // if playerID == 1 -> open game setup, otherwise -> open main game frame
     private class PlayButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
@@ -41,11 +42,9 @@ public class Controller {
                 initGameSetup();
             }
             else {
-                initGameView();
-                menu.closeMenu();
-                //
                 clientSideConnection.getPlayerInitialHand();
-                gameView.setHand(player.getHandOfCards());
+                initGameView();
+                menu.closeMenu();               // close menu frame
             }
         }
     }
@@ -72,13 +71,12 @@ public class Controller {
             JButton b = (JButton) actionEvent.getSource();
             int numPlayers = Integer.parseInt(b.getText());
             clientSideConnection.setPlayersNumber(numPlayers);  // send selected player number to server
-            System.out.println(numPlayers);
+            clientSideConnection.getPlayerInitialHand();
+            System.out.println("Number of players: " + numPlayers);
+
             initGameView();                                     // display game frame
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
-            //
-            clientSideConnection.getPlayerInitialHand();
-            gameView.setHand(player.getHandOfCards());
         }
     }
 
@@ -86,7 +84,7 @@ public class Controller {
 
         // display game frame, create listener for player hand
     private void initGameView() {
-        gameView = new GameView();
+        gameView = new GameView(player.getPlayerID(), player.getHandOfCards(), player.getCardCount());
         gameView.showGameWindow();
         gameView.playerHand.addMouseListener(new PlayerHandListener());
     }

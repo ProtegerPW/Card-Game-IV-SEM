@@ -1,7 +1,6 @@
 package ui.view;
 
 import com.company.PanCard;
-import com.company.PanDeck;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,11 +16,16 @@ public class GameView extends JFrame {
     public JPanel opponentHand3;
     public JPanel stockpile;
 
+    private int playerID;
     private ArrayList<PanCard> hand;
     private Map<PanCard, Rectangle> mapCards;
     private int cardCount[];
 
-    public GameView() {
+    public GameView(int playerID, ArrayList<PanCard> hand, int cardCount[]) {
+        this.playerID = playerID;
+        this.hand = hand;
+        mapCards = new HashMap<>(1);
+        this.cardCount = cardCount;
         setSize(1280, 720);
         setContentPane(mainGamePanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,55 +68,58 @@ public class GameView extends JFrame {
         this.cardCount = cardCount;
     }
 
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+
     public class PlayerHand extends JPanel {
         public PlayerHand() {
-            mapCards = new HashMap<>(5);
             setSize(-1, 150);
             setPreferredSize(new Dimension(-1,150));
             setMaximumSize(new Dimension(-1,200));
             setBackground(Color.CYAN);
         }
-//
-//        @Override
-//        public void invalidate() {
-//            super.invalidate();
-//            mapCards.clear();
-//            int cardHeight = (getHeight() - 20) / 3;
-//            int cardWidth = (int) (cardHeight * 0.6);
-//            int xDelta = cardWidth / 2;
-//            int xPos = (int) ((getWidth() / 2) - (cardWidth * (hand.size() / 4.0)));
-//            int yPos = (getHeight() - 20) - cardHeight;
-//            for (PanCard card: hand) {
-//                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
-//                mapCards.put(card, bounds);
-//                xPos += xDelta;
-//            }
-//        }
-//
-//        protected void paintComponent(Graphics g) {
-//            super.paintComponent(g);
-//            Graphics2D g2d = (Graphics2D) g.create();
-//            for(PanCard card: hand) {
-//                Rectangle bounds = mapCards.get(card);
-//                System.out.println(bounds);
-//                if (bounds != null) {
-//                    g2d.setColor(Color.WHITE);
-//                    g2d.fill(bounds);
-//                    g2d.setColor(Color.BLACK);
-//                    g2d.draw(bounds);
-//                    Graphics2D copy = (Graphics2D) g2d.create();
-//                    paintCard(copy, card, bounds);
-//                    copy.dispose();
-//                }
-//            }
-//            g2d.dispose();
-//        }
-//
-//        protected void paintCard(Graphics2D g2d, PanCard card, Rectangle bounds) {
-//            g2d.translate(bounds.x + 5, bounds.y + 5);
-//            g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
-//        }
+
+        @Override
+        public void invalidate() {
+            super.invalidate();
+            mapCards.clear();
+            int cardHeight = (getHeight() - 20) / 3;
+            int cardWidth = (int) (cardHeight * 0.6);
+            int xDelta = cardWidth / 2;
+            int xPos = (int) ((getWidth() / 2) - (cardWidth * (hand.size() / 4.0)));
+            int yPos = (getHeight() - 20) - cardHeight;
+            for (PanCard card: hand) {
+                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
+                mapCards.put(card, bounds);
+                xPos += xDelta;
+            }
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            for(PanCard card: hand) {
+                Rectangle bounds = mapCards.get(card);
+                System.out.println(bounds);
+                if (bounds != null) {
+                    g2d.setColor(Color.WHITE);
+                    g2d.fill(bounds);
+                    g2d.setColor(Color.BLACK);
+                    g2d.draw(bounds);
+                    Graphics2D copy = (Graphics2D) g2d.create();
+                    paintCard(copy, card, bounds);
+                    copy.dispose();
+                }
+            }
+            g2d.dispose();
+        }
+
+        protected void paintCard(Graphics2D g2d, PanCard card, Rectangle bounds) {
+            g2d.translate(bounds.x + 5, bounds.y + 5);
+            g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
+        }
     }
+
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class OpponentHandHorizontal extends JPanel {
         public OpponentHandHorizontal() {
@@ -122,6 +129,8 @@ public class GameView extends JFrame {
             setBackground(Color.MAGENTA);
         }
     }
+
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class OpponentHandVertical extends JPanel {
         public OpponentHandVertical() {

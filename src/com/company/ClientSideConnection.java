@@ -37,7 +37,7 @@ public class ClientSideConnection {
     }
 
         // obtain initial hand from server
-    public void initPlayerHand() {
+    public void getPlayerInitialHand() {
         try {
             int cardNumber = dataIn.readInt();
             System.out.println("number of cards " + cardNumber );

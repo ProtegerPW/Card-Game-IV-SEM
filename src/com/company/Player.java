@@ -26,11 +26,11 @@ public class Player {
     private int[] cardCount;
     private PanCard selectedCard;
     private ArrayList<PanCard> stockpile;
-    private PanCard topCard; //TODO delete this argument - is redundant
 
     public Player() {
         playerID = -1;
         handOfCards = new ArrayList<PanCard>();
+        stockpile = new ArrayList<PanCard>();
     }
 
     public int getPlayerID() { return playerID; }
@@ -68,8 +68,6 @@ public class Player {
     public PanCard getSelectedCard() { return selectedCard; }
 
     public void setSelectedCard(PanCard selectedCard) { this.selectedCard = selectedCard; }
-
-    public void setTopCard(PanCard topCard) { this.topCard = topCard; }
 
     public void initCardCount(int cardNumber) {
         if(6 == cardNumber)

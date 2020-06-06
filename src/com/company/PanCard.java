@@ -51,16 +51,16 @@ public class PanCard {
         int colorNum;
         String colorName = this.color.toString();
         switch (colorName) {
-            case "Spade":
+            case "Heart":
                 colorNum = 0;
                 break;
-            case "Club":
+            case "Spade":
                 colorNum = 1;
                 break;
-            case "Heart":
+            case "Diamond":
                 colorNum = 2;
                 break;
-            case "Diamond":
+            case "Club":
                 colorNum = 3;
                 break;
             default:
@@ -150,6 +150,24 @@ public class PanCard {
             }
         });
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof PanCard)) {
+            return false;
+        }
+        PanCard c = (PanCard) obj;
+
+        // Compare the data members and return accordingly
+        return Integer.compare(getColorInt(), c.getColorInt()) == 0
+                && Integer.compare(getValueInt(), c.getValueInt()) == 0;
+    }
+
+
 
 
 //    public static void sortTable (ArrayList<ArrayList<Integer>> cardTable) {

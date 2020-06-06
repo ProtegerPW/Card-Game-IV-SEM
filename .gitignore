@@ -1,1 +1,6 @@
 .idea/
+out/
+plan
+player.jar
+server.jar
+src/ui/view/SimpleCards.java

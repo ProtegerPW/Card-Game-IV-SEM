@@ -22,6 +22,10 @@ public class PanDeck {
         }
     }
 
+    public PanCard[] getDeck() {
+        return cards;
+    }
+
     public void shuffle() {
         int n = cards.length;
         Random random = new Random();

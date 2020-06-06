@@ -97,9 +97,10 @@ public class Controller {
             if (selected != null) {
                 Rectangle bounds = gameView.getMapCards().get(selected);
                 bounds.y += 20;
-                gameView.playerHand.repaint();
+                 gameView.playerHand.repaint();
             }
-            for(PanCard card: player.getHandOfCards()) {
+            player.setSelectedCard(null);
+            for(PanCard card: player.getReversedHandOfCards()) {
                 Rectangle bounds = gameView.getMapCards().get(card);
                 if(bounds.contains(e.getPoint())) {
                     player.setSelectedCard(card);

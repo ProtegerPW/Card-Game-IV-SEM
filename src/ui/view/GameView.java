@@ -26,7 +26,7 @@ public class GameView extends JFrame {
         this.hand = hand;
         mapCards = new HashMap<>(1);
         this.cardCount = cardCount;
-        setSize(1280, 720);
+        setSize(1280, 760);
         setContentPane(mainGamePanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -72,9 +72,6 @@ public class GameView extends JFrame {
 
     public class PlayerHand extends JPanel {
         public PlayerHand() {
-            setSize(-1, 150);
-            setPreferredSize(new Dimension(-1,150));
-            setMaximumSize(new Dimension(-1,200));
             setBackground(Color.CYAN);
         }
 
@@ -82,11 +79,11 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int cardHeight = (getHeight() - 20) / 3;
-            int cardWidth = (int) (cardHeight * 0.6);
-            int xDelta = cardWidth / 2;
-            int xPos = (int) ((getWidth() / 2) - (cardWidth * (hand.size() / 4.0)));
-            int yPos = (getHeight() - 20) - cardHeight;
+            int cardHeight = 180;
+            int cardWidth = 120;
+            int xDelta = 40;
+            int xPos = ((getWidth() - cardWidth - (hand.size() - 1)*xDelta)/2);
+            int yPos = getHeight() - 20 - cardHeight;
             for (PanCard card: hand) {
                 Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapCards.put(card, bounds);
@@ -124,8 +121,6 @@ public class GameView extends JFrame {
     public class OpponentHandHorizontal extends JPanel {
         public OpponentHandHorizontal() {
             setSize(-1, 150);
-            setPreferredSize(new Dimension(-1,150));
-            setMaximumSize(new Dimension(-1,200));
             setBackground(Color.MAGENTA);
         }
     }
@@ -135,8 +130,6 @@ public class GameView extends JFrame {
     public class OpponentHandVertical extends JPanel {
         public OpponentHandVertical() {
             setSize(150, -1);
-            setPreferredSize(new Dimension(150,-1));
-            setMaximumSize(new Dimension(200,-1));
             setBackground(Color.ORANGE);
         }
     }

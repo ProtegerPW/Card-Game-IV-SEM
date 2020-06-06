@@ -11,6 +11,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 
@@ -60,6 +61,12 @@ public class Player {
     public ArrayList<PanCard> getHandOfCards() { return handOfCards; }
 
     public void setHandOfCards(ArrayList<PanCard> handOfCards) { this.handOfCards = handOfCards; }
+
+    public ArrayList<PanCard> getReversedHandOfCards() {
+        ArrayList<PanCard> reversedHandOfCards = new ArrayList<>(handOfCards);
+        Collections.reverse(reversedHandOfCards);
+        return reversedHandOfCards;
+    }
 
     public int[] getCardCount() { return cardCount; }
 

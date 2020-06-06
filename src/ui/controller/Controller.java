@@ -44,7 +44,7 @@ public class Controller {
                 initGameView();
                 menu.closeMenu();
                 //
-                clientSideConnection.readCards();
+                clientSideConnection.initPlayerHand();
                 //gameView.setHand(player.getHandOfCards());
             }
         }
@@ -77,7 +77,7 @@ public class Controller {
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
             //
-            clientSideConnection.readCards();
+            clientSideConnection.initPlayerHand();
             //gameView.setHand(player.getHandOfCards());
         }
     }

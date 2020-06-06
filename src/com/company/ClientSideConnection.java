@@ -37,7 +37,7 @@ public class ClientSideConnection {
     }
 
         // obtain initial hand from server
-    public void readCards() {
+    public void initPlayerHand() {
         try {
             int cardNumber = dataIn.readInt();
             System.out.println("number of cards " + cardNumber );
@@ -88,20 +88,30 @@ public class ClientSideConnection {
 
     public void receiveUpdate() {
         try {
-            int numOfCards = dataIn.readInt(); //if numOfCards == -1 it means the opponent draw cards
+            int numOfCards = dataIn.readInt(); //if numOfCards == -1 it means the opponent draws cards
             if(numOfCards < 0) {
                 for(int i = 0; i < 3; i++) {
-                    if(stockpile.size() == 1) break;
-                    stockpile.remove(stockpile.size() - 1);
+                    if(player.getStockpileSize() == 1) break;
+                    player.popStockpile();
                 }
             } else {
                 for(int i = 0; i < numOfCards; i++) {
-                    stockpile.add(readCard());
+                    player.pushStockpile(readCard());
                 }
             }
         } catch(IOException ex) {
             System.out.println(" IOException from receiveUpdate() ");
         }
+    }
+
+    public PanCard readCard() {
+        PanCard tempCard = new PanCard(PanCard.Color.getColor(0),PanCard.Value.getValue(0));
+        try {
+            return new PanCard(PanCard.Color.getColor(dataIn.readInt()), PanCard.Value.getValue(dataIn.readInt()));
+        } catch (IOException ex) {
+            System.out.println(" IOException from readCard() ");
+        }
+        return tempCard;
     }
 
     public void sendCommunicate(String text, ArrayList<PanCard> cards) {

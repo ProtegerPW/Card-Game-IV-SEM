@@ -100,6 +100,18 @@ public class Player {
         }
     }
 
+    public int getStockpileSize() {
+        return stockpile.size();
+    }
+
+    public void popStockpile() {
+        stockpile.remove(stockpile.size() - 1);
+    }
+
+    public void pushStockpile(PanCard card) {
+        stockpile.add(card);
+    }
+
     public boolean checkCardIsValid(PanCard card) {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }

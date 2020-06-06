@@ -21,6 +21,8 @@ public class Player {
     private int turn;
     private boolean buttonsEnable;
     private ArrayList<PanCard> handOfCards;
+
+
     private int[] cardCount;
     private PanCard selectedCard;
     private ArrayList<PanCard> stockpile;
@@ -37,6 +39,24 @@ public class Player {
 
     public void setPlayerID(int playerID) {
         this.playerID = playerID;
+    }
+
+    public int getCurrentPlayer() { return currentPlayer; }
+
+    public void setCurrentPlayer(int isClubOnTop) {
+        if(isClubOnTop == 1) {
+            if(currentPlayer == 1) {
+                currentPlayer = cardCount.length;
+            } else {
+                currentPlayer--;
+            }
+        } else {
+            if(cardCount.length == 2 && currentPlayer == 2 || cardCount.length == 4 && currentPlayer == 4) {
+                currentPlayer = 1;
+            } else {
+                currentPlayer++;
+            }
+        }
     }
 
     public ArrayList<PanCard> getHandOfCards() {
@@ -64,6 +84,14 @@ public class Player {
             cardCount = new int[]{6, 6, 6, 6};
         else
             cardCount = new int[]{12, 12};
+    }
+
+    public void changeCardCount(int playerID, int direction) {
+        if (direction < 0) {
+            this.cardCount[playerID - 1]--;
+        } else {
+            this.cardCount[playerID - 1]++;
+        }
     }
 
     public void addCardToHand(PanCard card) {
@@ -114,6 +142,14 @@ public class Player {
 
     public boolean checkCardIsValid(PanCard card) {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
+    }
+
+    public int lastColorOnStockpile() {
+        if(stockpile.get(stockpile.size() - 1).getColorInt() == 1) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     public void deleteCardFromHand(PanCard card) {

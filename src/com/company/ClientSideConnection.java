@@ -78,6 +78,7 @@ public class ClientSideConnection {
                 int value = cards.get(i).getValueInt();
                 dataOut.writeInt(color);
                 dataOut.writeInt(value);
+                player.pushStockpile(new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value)));
                 player.deleteCardFromHand(cards.get(i));
             }
             dataOut.flush();
@@ -93,12 +94,15 @@ public class ClientSideConnection {
                 for(int i = 0; i < 3; i++) {
                     if(player.getStockpileSize() == 1) break;
                     player.popStockpile();
+                    player.changeCardCount(player.getCurrentPlayer(), numOfCards);
                 }
             } else {
                 for(int i = 0; i < numOfCards; i++) {
                     player.pushStockpile(readCard());
+                    player.changeCardCount(player.getCurrentPlayer(), numOfCards);
                 }
             }
+            player.setCurrentPlayer(player.lastColorOnStockpile());
         } catch(IOException ex) {
             System.out.println(" IOException from receiveUpdate() ");
         }
@@ -128,10 +132,12 @@ public class ClientSideConnection {
                     dataOut.flush();
                     int numOfDrawCards = dataIn.readInt();
                     for(int i = 0; i < numOfDrawCards; i++) {
+                        //TODO can be optimized: readInt() into PanCard constructor & new PanCard as argument to addCardToHand()
                         color = dataIn.readInt();
                         value = dataIn.readInt();
                         PanCard tempListOfCard = new PanCard(PanCard.Color.getColor(color),PanCard.Value.getValue(value));
                         player.addCardToHand(tempListOfCard);
+                        player.popStockpile();
                     }
                     player.sortHand();
                     break;

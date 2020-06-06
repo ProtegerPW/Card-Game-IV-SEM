@@ -102,22 +102,82 @@ public class Controller {
         @Override
         public void mouseClicked(MouseEvent e) {
             System.out.println( "Clicked" );
-            PanCard selected = player.getSelectedCard();
-            if (selected != null) {
-                Rectangle bounds = gameView.getMapPlayerHand().get(selected);
-                bounds.y += 20;
-                 gameView.playerHand.repaint();
+            PanCard clicked = getClickedCard(e);
+            if(clicked == null) {        // if player clicked outside of cards area -> do nothing
+                System.out.println("No cards selected");
+                PanCard tmp = player.getSelectedCard();
+                if(tmp != null) {       // if there was a card previously selected, deselect it
+                    player.setSelectedCard(null);
+                    pullCardDown(tmp);
+                }
+                return;
             }
-            player.setSelectedCard(null);
+            boolean validMove = player.checkCardIsValid(clicked);
+            if(!validMove) {      // check if clicked card can be put onto the stockpile
+                System.out.println("Illegal move");
+                PanCard tmp = player.getSelectedCard();
+                if(tmp != null) {       // if there was a card previously selected, deselect it
+                    player.setSelectedCard(null);
+                    pullCardDown(tmp);
+                }
+                return;
+            }
+            boolean multiCard = player.checkMultiCard(clicked);     // check if player has all cards of selected value
+            if(!multiCard) {      // if no -> play clicked card
+                System.out.println("Play clicked card");
+                PanCard tmp = player.getSelectedCard();
+                if(tmp != null) {       // if there was a card previously selected, deselect it
+                    player.setSelectedCard(null);
+                    pullCardDown(tmp);
+                }
+                // TODO
+                player.deleteCardFromHand(clicked);
+                gameView.setHand(player.getHandOfCards());
+                gameView.playerHand.invalidate();
+                gameView.playerHand.repaint();   // update playerHand view
+            }
+            else {                // player can play multiple cards
+                System.out.println( "Multiple cards option" );
+                PanCard tmp = player.getSelectedCard();
+                if(tmp == null) {
+                    player.setSelectedCard(clicked);   // mark card as selected
+                    pullCardUp(clicked);               // display selection on player's hand
+                } else if(tmp != clicked) {       // if there was a card previously selected, deselect it
+                    player.setSelectedCard(clicked);
+                    pullCardDown(tmp);
+                    pullCardUp(clicked);
+                }
+            }
+//            for(PanCard card: player.getReversedHandOfCards()) {
+//                Rectangle bounds = gameView.getMapPlayerHand().get(card);
+//                if(bounds.contains(e.getPoint())) {
+//                    player.setSelectedCard(card);
+//                    bounds.y -= 20;
+//                    gameView.playerHand.repaint();
+//                    break;
+//                }
+//            }
+        }
+
+        public PanCard getClickedCard(MouseEvent e) {
             for(PanCard card: player.getReversedHandOfCards()) {
                 Rectangle bounds = gameView.getMapPlayerHand().get(card);
                 if(bounds.contains(e.getPoint())) {
-                    player.setSelectedCard(card);
-                    bounds.y -= 20;
-                    gameView.playerHand.repaint();
-                    break;
+                    return card;
                 }
             }
+            return null;
+        }
+            // move card down in playerHand view -> deselect highlighted card
+        public void pullCardDown(PanCard card) {
+            gameView.getMapPlayerHand().get(card).y += 20;
+            gameView.playerHand.repaint();
+        }
+
+        // move card up in playerHand view -> select clicked card
+        public void pullCardUp(PanCard card) {
+            gameView.getMapPlayerHand().get(card).y -= 20;
+            gameView.playerHand.repaint();
         }
     }
 }

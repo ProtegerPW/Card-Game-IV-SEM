@@ -128,7 +128,8 @@ public class Player {
     public void pushStockpile(PanCard card) { stockpile.add(card); }
 
     public boolean checkCardIsValid(PanCard card) {
-        return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
+        //return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
+        return true;
     }
 
     public boolean checkCardIsHeartNine(PanCard card) {

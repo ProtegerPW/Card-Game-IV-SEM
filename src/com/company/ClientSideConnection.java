@@ -48,9 +48,7 @@ public class ClientSideConnection {
                 PanCard cardBuffer = new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value));
                 player.addCardToHand(cardBuffer);
             }
-            if(dataIn.readInt() == 1) {
-                System.out.println("You begin!");
-            }
+            player.setCurrentPlayer(dataIn.readInt());
             player.sortHand();
             player.printHand();
         } catch (IOException ex) {
@@ -94,12 +92,12 @@ public class ClientSideConnection {
                 for(int i = 0; i < 3; i++) {
                     if(player.getStockpileSize() == 1) break;
                     player.popStockpile();
-                    player.changeCardCount(player.getCurrentPlayer(), numOfCards);
+                    player.changeCardCount(player.getCurrentPlayer(), 1);
                 }
             } else {
                 for(int i = 0; i < numOfCards; i++) {
                     player.pushStockpile(readCard());
-                    player.changeCardCount(player.getCurrentPlayer(), numOfCards);
+                    player.changeCardCount(player.getCurrentPlayer(), -1);
                 }
             }
             player.setNextPlayer(player.lastColorOnStockpile());
@@ -115,6 +113,7 @@ public class ClientSideConnection {
         } catch (IOException ex) {
             System.out.println(" IOException from readCard() ");
         }
+        System.out.println("added additional Heart_Nine");
         return tempCard;
     }
 

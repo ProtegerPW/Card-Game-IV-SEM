@@ -45,6 +45,15 @@ public class Controller {
                 clientSideConnection.getPlayerInitialHand();
                 initGameView();
                 menu.closeMenu();               // close menu frame
+                if (player.getCurrentPlayer() != player.getPlayerID()) {
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            clientSideConnection.receiveUpdate();
+                        }
+                    });
+                    t.start();
+                }
             }
         }
     }

@@ -210,7 +210,6 @@ public class GameServer {
         public void run() {
             try {
                 int numOfCards = (gameDeck.getLength() / numPlayers);
-                int playerFlag = 0;
                 dataOut.writeInt(numOfCards);
                 dataOut.flush();
 
@@ -221,10 +220,9 @@ public class GameServer {
                     if(tempCard.getColorInt() == 0 && tempCard.getValueInt() == 0) {
                         currentPlayer = playerID;
                         System.out.println("First player is " + playerID);
-                        playerFlag = 1;
                     }
                 }
-                dataOut.writeInt(playerFlag);
+                dataOut.writeInt(currentPlayer);
                 dataOut.flush();
 
                 while(true) { //TODO send players number of cards of their opponents

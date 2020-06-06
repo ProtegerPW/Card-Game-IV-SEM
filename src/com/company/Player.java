@@ -131,6 +131,15 @@ public class Player {
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 
+    public boolean checkCardIsHeartNine(PanCard card) {
+        if(card.getColorInt() == 0) {
+            if(card.getValueInt() == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int lastColorOnStockpile() {
         if(stockpile.get(stockpile.size() - 1).getColorInt() == 1) {
             return 1;

@@ -19,7 +19,7 @@ public class GameServer {
     private PanCard.Color validColor;
     private PanCard.Value validValue;
 
-    int currentPlayer;
+    private int currentPlayer;
 
     public GameServer() {
         System.out.println("---- Game Server ----");
@@ -36,6 +36,14 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from GameSever Constructor");
         }
+    }
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 
     public void waitForHost() {
@@ -58,6 +66,7 @@ public class GameServer {
                 playerHand.add(hand);
                 System.out.println("Created hand #" + (i + 1));
             }
+            setFirstPlayer();
             numConPlayers++;
             Thread t = new Thread(ssc);
             t.start();
@@ -97,6 +106,17 @@ public class GameServer {
             ss.close();
         } catch (IOException ex) {
             System.out.println("Exception from closeConnection() ");
+        }
+    }
+
+    public void setFirstPlayer() {
+        for(int i = 0; i < numPlayers; i++) {
+            for(PanCard card : playerHand.get(i)) {
+                if(card.getValueInt() == 0 && card.getColorInt() == 0) {
+                    setCurrentPlayer(i + 1);
+                    System.out.println("First player is " + getCurrentPlayer());
+                }
+            }
         }
     }
 
@@ -217,22 +237,20 @@ public class GameServer {
                     PanCard tempCard = playerHand.get(playerID - 1).get(i);
                     dataOut.writeInt(tempCard.getColorInt());
                     dataOut.writeInt(tempCard.getValueInt());
-                    if(tempCard.getColorInt() == 0 && tempCard.getValueInt() == 0) {
-                        currentPlayer = playerID;
-                        System.out.println("First player is " + playerID);
-                    }
                 }
-                dataOut.writeInt(currentPlayer);
+                dataOut.writeInt(getCurrentPlayer());
                 dataOut.flush();
 
                 while(true) { //TODO send players number of cards of their opponents
                             //TODO send player new stockpile
                     if(playerID == 1) {
                         String readText = dataIn.readUTF();
+                        System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
 
                     } else if(playerID == 2) {
                         String readText = dataIn.readUTF();
+                        System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     }
                     if(numConPlayers == 2) continue;

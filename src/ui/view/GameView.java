@@ -19,6 +19,9 @@ public class GameView extends JFrame {
     public JPanel opponentHand3;
     public JPanel stockpile;
 
+    private JButton drawCardsButton;
+    private JButton playSelectedButton;
+
     private int numOfPlayers;
     private int playerID;
     private int cardCount[];
@@ -78,27 +81,64 @@ public class GameView extends JFrame {
         this.cardCount = cardCount;
     }
 
+
+    public JButton getDrawCardsButton() {
+        return drawCardsButton;
+    }
+
+    public JButton getPlaySelectedButton() {
+        return playSelectedButton;
+    }
+
+    public void enableDrawCardsButton() {
+        drawCardsButton.setEnabled(true);
+    }
+
+    public void disableDrawCardsButton() {
+        drawCardsButton.setEnabled(false);
+    }
+
+    public void enablePlaySelectedButton() {
+        playSelectedButton.setEnabled(true);
+    }
+
+    public void disablePlaySelectedButton() {
+        playSelectedButton.setEnabled(false);
+    }
+
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class PlayerHand extends JPanel {
+        final int CARD_HEIGHT = 180;
+        final int CARD_WIDTH = 120;
+        final int DELTA_X = 40;
+        final int MARGIN = 20;
+
         public PlayerHand() {
             mapPlayerHand = new HashMap<>(1);
+            drawCardsButton = new JButton("draw");
+            playSelectedButton = new JButton("play selected card");
+            addButtonsToFrame();
+            drawCardsButton.setEnabled(false);
+            playSelectedButton.setEnabled(false);
             setBackground(Color.CYAN);
+        }
+
+        public void addButtonsToFrame() {
+            add(drawCardsButton);
+            add(playSelectedButton);
         }
 
         @Override
         public void invalidate() {
             super.invalidate();
             mapPlayerHand.clear();
-            int cardHeight = 180;
-            int cardWidth = 120;
-            int xDelta = 40;
-            int xPos = ((getWidth() - cardWidth - (hand.size() - 1)*xDelta)/2);
-            int yPos = getHeight() - 20 - cardHeight;
+            int xPos = ((getWidth() - CARD_WIDTH - (hand.size() - 1)*DELTA_X)/2);
+            int yPos = getHeight() - MARGIN - CARD_HEIGHT;
             for (PanCard card: hand) {
-                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
+                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapPlayerHand.put(card, bounds);
-                xPos += xDelta;
+                xPos += DELTA_X;
             }
         }
 
@@ -138,6 +178,11 @@ public class GameView extends JFrame {
     public class OpponentHandHorizontal extends JPanel {
         private ArrayList<Rectangle> mapCards;
 
+        final int CARD_HEIGHT = 120;
+        final int CARD_WIDTH = 80;
+        final int DELTA_X = 27;
+        final int MARGIN = 20;
+
         public OpponentHandHorizontal() {
             mapCards = new ArrayList<>();
             setBackground(Color.MAGENTA);
@@ -147,16 +192,13 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int cardHeight = 120;
-            int cardWidth = 80;
-            int xDelta = 27;
-            int xPos = ((getWidth() - cardWidth - (hand.size() - 1)*xDelta)/2);
-            int yPos = getHeight() - 10 - cardHeight;
+            int xPos = ((getWidth() - CARD_WIDTH - (hand.size() - 1)*DELTA_X)/2);
+            int yPos = MARGIN;
             int opponentNumberOfCards = cardCount[(playerID + 1)%numOfPlayers];
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
-                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
+                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapCards.add(bounds);
-                xPos += xDelta;
+                xPos += DELTA_X;
             }
         }
 
@@ -195,6 +237,11 @@ public class GameView extends JFrame {
         String alignment;
         ArrayList<Rectangle> mapCards;
 
+        final int CARD_HEIGHT = 80;
+        final int CARD_WIDTH = 120;
+        final int DELTA_Y = 27;
+        final int MARGIN = 20;
+
         public OpponentHandVertical(String alignment) {
             setBackground(Color.ORANGE);
             mapCards = new ArrayList<>();
@@ -205,17 +252,15 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int cardHeight = 80;
-            int cardWidth = 120;
-            int yDelta = 27;
-            int xPos = getWidth() - 20 - cardWidth;
-            int yPos = (getHeight() - cardHeight - (hand.size() - 1)*yDelta)/2;
+            int xPos = alignment == "left"? MARGIN: getWidth() - MARGIN - CARD_WIDTH;
+            int handHeight = CARD_HEIGHT + (hand.size() - 1)*DELTA_Y;
+            int yPos = alignment == "left"? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
             int opponentID = alignment == "left"? playerID: playerID + 2;
             int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
-                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
+                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapCards.add(bounds);
-                yPos += yDelta;
+                yPos = alignment == "left"? yPos - DELTA_Y: yPos + DELTA_Y;
             }
         }
 

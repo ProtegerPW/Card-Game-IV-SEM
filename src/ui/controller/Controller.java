@@ -82,7 +82,6 @@ public class Controller {
             clientSideConnection.setPlayersNumber(numPlayers);  // send selected player number to server
             clientSideConnection.getPlayerInitialHand();
             System.out.println("Number of players: " + numPlayers);
-
             initGameView();                                     // display game frame
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
@@ -96,6 +95,8 @@ public class Controller {
         gameView = new GameView(player.getPlayerID(), player.getHandOfCards(), player.getCardCount());
         gameView.showGameWindow();
         gameView.playerHand.addMouseListener(new PlayerHandListener());
+        //gameView.getDrawCardsButton().addActionListener();
+        //gameView.getPlaySelectedButton().addActionListener();
     }
 
     public class PlayerHandListener extends MouseAdapter {
@@ -142,21 +143,12 @@ public class Controller {
                 if(tmp == null) {
                     player.setSelectedCard(clicked);   // mark card as selected
                     pullCardUp(clicked);               // display selection on player's hand
-                } else if(tmp != clicked) {       // if there was a card previously selected, deselect it
+                } else if(tmp != clicked) {       // player clicked another card of the same value -> pull it up
                     player.setSelectedCard(clicked);
                     pullCardDown(tmp);
                     pullCardUp(clicked);
                 }
             }
-//            for(PanCard card: player.getReversedHandOfCards()) {
-//                Rectangle bounds = gameView.getMapPlayerHand().get(card);
-//                if(bounds.contains(e.getPoint())) {
-//                    player.setSelectedCard(card);
-//                    bounds.y -= 20;
-//                    gameView.playerHand.repaint();
-//                    break;
-//                }
-//            }
         }
 
         public PanCard getClickedCard(MouseEvent e) {

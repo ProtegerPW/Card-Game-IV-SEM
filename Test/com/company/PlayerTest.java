@@ -11,16 +11,17 @@ class PlayerTest {
 
     @Test
     void setNextPlayer() {
+        //TODO has to make test based on created stockpile
         Player tempPlayer = new Player();
         tempPlayer.initCardCount(6); //it means there are 4 players
         tempPlayer.setCurrentPlayer(1);
         for(int i = 7; i > 0; i--) {
-            tempPlayer.setNextPlayer(1);    //in descending order
+            tempPlayer.setNextPlayer();    //in descending order
             Assert.assertEquals(((i % 4) + 1), tempPlayer.getCurrentPlayer());
         }
         tempPlayer.setCurrentPlayer(1);
         for(int i = 1; i < 10; i++) {
-            tempPlayer.setNextPlayer(0); //in ascending order
+            tempPlayer.setNextPlayer(); //in ascending order
             Assert.assertEquals(((i % 4) + 1), tempPlayer.getCurrentPlayer());
         }
 
@@ -28,12 +29,12 @@ class PlayerTest {
         tempPlayerTwo.initCardCount(12); //it means there are 2 players
         tempPlayerTwo.setCurrentPlayer(1);
         for(int i = 3; i > 0; i--) {
-            tempPlayerTwo.setNextPlayer(1);     //in descending order
+            tempPlayerTwo.setNextPlayer();     //in descending order
             Assert.assertEquals(((i % 2) + 1), tempPlayerTwo.getCurrentPlayer());
         }
         tempPlayerTwo.setCurrentPlayer(1);
         for(int i = 1; i < 10; i++) {
-            tempPlayerTwo.setNextPlayer(0);     //in ascending order
+            tempPlayerTwo.setNextPlayer();     //in ascending order
             Assert.assertEquals(((i % 2) + 1), tempPlayerTwo.getCurrentPlayer());
         }
     }

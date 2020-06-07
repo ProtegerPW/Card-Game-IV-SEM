@@ -33,6 +33,21 @@ public class Controller {
         menu.getExitButton().addActionListener(new Controller.ExitButtonListener());
     }
 
+    public void updateStatus() {
+        clientSideConnection.receiveUpdate();
+        configButtons();
+    }
+
+    public void configButtons() {
+        if (player.getCurrentPlayer() != player.getPlayerID()) {
+            mouseDisable();
+            System.out.println("Mouse disable");
+        } else {
+            mouseEnable();
+            System.out.println("Mouse enable");
+        }
+    }
+
         // if playerID == 1 -> open game setup, otherwise -> open main game frame
     private class PlayButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
@@ -46,15 +61,7 @@ public class Controller {
                 clientSideConnection.getPlayerInitialHand();
                 initGameView();
                 menu.closeMenu();               // close menu frame
-                if (player.getCurrentPlayer() != player.getPlayerID()) {
-                    Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            clientSideConnection.receiveUpdate();
-                        }
-                    });
-                    t.start();
-                }
+                configButtons();
             }
         }
     }
@@ -84,6 +91,7 @@ public class Controller {
             clientSideConnection.getPlayerInitialHand();
             System.out.println("Number of players: " + numPlayers);
             initGameView();                                     // display game frame
+            configButtons();
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
         }
@@ -100,20 +108,20 @@ public class Controller {
         gameView.getPlaySelectedButton().addActionListener(new PlaySelectedListener());
     }
 
-    boolean mouseEnable = false;
+    boolean mouseStatus = false;
 
     public void mouseEnable() {
-        mouseEnable = true;
+        mouseStatus = true;
     }
 
     public void mouseDisable() {
-        mouseEnable = false;
+        mouseStatus = false;
     }
 
     public class PlayerHandListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if(!mouseEnable) {           // activates only on player's turn
+            if(!mouseStatus) {           // activates only on player's turn
                 return;
             }
             System.out.println( "Clicked" );    // --delete later
@@ -131,6 +139,20 @@ public class Controller {
             if(!player.checkMultiCard(clicked)) {        // check if player has all cards of clicked card value
                 System.out.println("Play clicked card");    // if no -> play clicked card   // --delete later
                 resetSelectedCards();
+                clientSideConnection.sendCommunicate("addCards", new ArrayList<PanCard>() {{
+                    add(clicked);
+                }});
+                while (player.getCurrentPlayer() != player.getPlayerID()) {
+
+                    Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateStatus();
+                    }
+                });
+                t.start();
+                }
+
                 // TODO send played card to server
                 // TODO remove card from hand
                 // TODO update stockpile, update player hand (Konrad)

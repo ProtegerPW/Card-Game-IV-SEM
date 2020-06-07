@@ -43,8 +43,8 @@ public class Player {
 
     public void setCurrentPlayer(int numOfPlayer) { this.currentPlayer = numOfPlayer;}
 
-    public void setNextPlayer(int isClubOnTop) {
-        if(isClubOnTop == 1) {
+    public void setNextPlayer() {
+        if(lastColorOnStockpile()) {
             if(currentPlayer == 1) {
                 currentPlayer = cardCount.length;
             } else {
@@ -146,11 +146,11 @@ public class Player {
         return false;
     }
 
-    public int lastColorOnStockpile() {
+    public boolean lastColorOnStockpile() {
         if(stockpile.get(stockpile.size() - 1).getColorInt() == 1) {
-            return 1;
+            return true;
         } else {
-            return 0;
+            return false;
         }
     }
 

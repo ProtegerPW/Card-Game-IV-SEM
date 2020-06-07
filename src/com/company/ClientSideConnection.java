@@ -49,6 +49,7 @@ public class ClientSideConnection {
                 player.addCardToHand(cardBuffer);
             }
             player.setCurrentPlayer(dataIn.readInt());
+            System.out.println("First player is: " + player.getCurrentPlayer());
             player.sortHand();
             player.printHand();
         } catch (IOException ex) {
@@ -80,6 +81,7 @@ public class ClientSideConnection {
                 player.deleteCardFromHand(cards.get(i));
             }
             dataOut.flush();
+            player.setNextPlayer();
         } catch(IOException ex) {
             System.out.println("IOException from sendAndDeleteCard() ");
         }
@@ -100,7 +102,7 @@ public class ClientSideConnection {
                     player.changeCardCount(player.getCurrentPlayer(), -1);
                 }
             }
-            player.setNextPlayer(player.lastColorOnStockpile());
+            player.setNextPlayer();
         } catch(IOException ex) {
             System.out.println(" IOException from receiveUpdate() ");
         }
@@ -138,6 +140,7 @@ public class ClientSideConnection {
                         player.addCardToHand(tempListOfCard);
                         player.popStockpile();
                     }
+                    player.setNextPlayer();
                     player.sortHand();
                     break;
             }

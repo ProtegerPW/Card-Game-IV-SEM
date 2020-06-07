@@ -102,23 +102,18 @@ public class Player {
     }
 
     public boolean checkMultiCard(PanCard card) { //TODO implement & check this method
-        if(checkCardIsValid(card)) {
-            int multipleCards = 0;
-            for(int i = 0; i < handOfCards.size(); i++) {
-                if(card.getValueInt() == handOfCards.get(i).getValueInt()) {
-                    multipleCards++;
-                }
+        int multipleCards = 0;
+        for(int i = 0; i < handOfCards.size(); i++) {
+            if(card.getValueInt() == handOfCards.get(i).getValueInt()) {
+                multipleCards++;
             }
-            if(card.getValueInt() == 0 && multipleCards == 3) {
-                return true;
-            } else if (multipleCards == 4) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
         }
+        if(card.getValueInt() == 0 && multipleCards == 3) {
+            return true;
+        } else if (multipleCards == 4) {
+            return true;
+        }
+        return false;
     }
 
     public int getStockpileSize() { return stockpile.size(); }
@@ -128,8 +123,9 @@ public class Player {
     public void pushStockpile(PanCard card) { stockpile.add(card); }
 
     public boolean checkCardIsValid(PanCard card) {
-        //return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
-        return true;
+        if(stockpile.size() == 0)
+            return checkCardIsHeartNine(card);
+        return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 
     public boolean checkCardIsHeartNine(PanCard card) {

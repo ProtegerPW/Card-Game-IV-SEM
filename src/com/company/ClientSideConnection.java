@@ -90,6 +90,7 @@ public class ClientSideConnection {
     public void receiveUpdate() {
         try {
             int numOfCards = dataIn.readInt(); //if numOfCards == -1 it means the opponent draws cards
+            System.out.println("receiveUpdate() " + numOfCards);
             if(numOfCards < 0) {
                 for(int i = 0; i < 3; i++) {
                     if(player.getStockpileSize() == 1) break;
@@ -121,6 +122,7 @@ public class ClientSideConnection {
 
     public void sendCommunicate(String text, ArrayList<PanCard> cards) {
         try {
+            System.out.println("sendCommunicate() " + text);
             int color = 0;
             int value = 0;
             switch(text) {

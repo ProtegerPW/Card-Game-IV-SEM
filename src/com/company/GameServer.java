@@ -171,6 +171,7 @@ public class GameServer {
                     addCardToStockpile(tempCard);
                 }
                 updateStatus(playerID, numOfCards);
+                System.out.println("Last card on stockpile: " + stockpile.get(stockpile.size() - 1).toString());
             } catch(IOException ex) {
                 System.out.println("IOException from readAndUpdateCardStatus() ");
             }
@@ -222,8 +223,9 @@ public class GameServer {
 
         public void updateStatus(int playerID, int numOfCards) {
             for(int i = 0; i < numConPlayers; i++) {
-                if(i == playerID) continue;
+                if((i+1) == playerID) continue;
                 players[i].sendCurrentStockpile(numOfCards);
+                System.out.println("Send updateStatus() for " + (i+1) + " player");
             }
         }
 
@@ -256,9 +258,11 @@ public class GameServer {
                     if(numConPlayers == 2) continue;
                     if(playerID == 3) {
                         String readText = dataIn.readUTF();
+                        System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     } else if(playerID == 4) {
                         String readText = dataIn.readUTF();
+                        System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     }
                 }

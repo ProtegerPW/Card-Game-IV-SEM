@@ -41,6 +41,13 @@ public class Controller {
     public void configButtons() {
         if (player.getCurrentPlayer() != player.getPlayerID()) {
             mouseDisable();
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    updateStatus();
+                }
+            });
+            t.start();
             System.out.println("Mouse disable");
         } else {
             mouseEnable();
@@ -61,7 +68,6 @@ public class Controller {
                 clientSideConnection.getPlayerInitialHand();
                 initGameView();
                 menu.closeMenu();               // close menu frame
-                configButtons();
             }
         }
     }
@@ -91,7 +97,6 @@ public class Controller {
             clientSideConnection.getPlayerInitialHand();
             System.out.println("Number of players: " + numPlayers);
             initGameView();                                     // display game frame
-            configButtons();
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
         }
@@ -106,6 +111,7 @@ public class Controller {
         gameView.playerHand.addMouseListener(new PlayerHandListener());
         gameView.getDrawCardsButton().addActionListener(new DrawCardsListener());
         gameView.getPlaySelectedButton().addActionListener(new PlaySelectedListener());
+        configButtons();
     }
 
     boolean mouseStatus = false;
@@ -142,16 +148,24 @@ public class Controller {
                 clientSideConnection.sendCommunicate("addCards", new ArrayList<PanCard>() {{
                     add(clicked);
                 }});
-                while (player.getCurrentPlayer() != player.getPlayerID()) {
+                configButtons();
 
-                    Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateStatus();
-                    }
-                });
-                t.start();
-                }
+//                Thread t = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        updateStatus();
+//                    }
+//                });
+//                t.start();
+
+//                Thread t = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        while(player.getCurrentPlayer() != player.getPlayerID())
+//                            updateStatus();
+//                    }
+//                });
+//                t.start();
 
                 // TODO send played card to server
                 // TODO remove card from hand

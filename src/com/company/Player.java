@@ -25,13 +25,14 @@ public class Player {
 
 
     private int[] cardCount;
-    private PanCard selectedCard;
+    private ArrayList<PanCard> selectedCards;
     private ArrayList<PanCard> stockpile;
 
     public Player() {
         playerID = -1;
-        handOfCards = new ArrayList<PanCard>();
-        stockpile = new ArrayList<PanCard>();
+        handOfCards = new ArrayList<>();
+        selectedCards = new ArrayList<>();
+        stockpile = new ArrayList<>();
     }
 
     public int getPlayerID() { return playerID; }
@@ -72,9 +73,17 @@ public class Player {
 
     public void setCardCount(int[] cardCount) { this.cardCount = cardCount; }
 
-    public PanCard getSelectedCard() { return selectedCard; }
+    public ArrayList<PanCard> getSelectedCards() { return selectedCards; }
 
-    public void setSelectedCard(PanCard selectedCard) { this.selectedCard = selectedCard; }
+    public void pushCardToSelected(PanCard clickedCard) { this.selectedCards.add(clickedCard); }
+
+    public void removeCardFromSelected(PanCard clickedCard) {
+        selectedCards.remove(clickedCard);
+    }
+
+    public void resetSelectedCards() {
+        selectedCards.clear();
+    }
 
     public void initCardCount(int cardNumber) {
         if(6 == cardNumber)
@@ -101,7 +110,7 @@ public class Player {
         }
     }
 
-    public boolean checkMultiCard(PanCard card) { //TODO implement & check this method
+    public boolean checkMultiCard(PanCard card) {   // TODO 3 dziewiątki bez kieru / 4 dziewiątki z kierem
         int multipleCards = 0;
         for(int i = 0; i < handOfCards.size(); i++) {
             if(card.getValueInt() == handOfCards.get(i).getValueInt()) {
@@ -146,24 +155,4 @@ public class Player {
     }
 
     public void deleteCardFromHand(PanCard card) { handOfCards.remove(card); }
-
-    // TODO private void drawCards();
-        // draw = true;
-    // player.drawCards();
-
-    // TODO private bool selectedCard(PanCard card); true -> może zrobić więcej; false -> nie może zrobić więcej - ruch zakończony
-    // if(player.selectedCard(card)) player.getMultipleCards(ArrayList<PanCard>);
-    // canPlay(card); true -> rzuć, false -> nic nie rób
-
-
-//    public static void main(String[] args) {
-//        Player player = new Player();
-//        Menu menu = new Menu();
-//        Controller controller = new Controller(player, menu);
-//        controller.initController();
-//        // TODO frameController.obtainData(p);
-//        // TODO p <- action (draw/play 1 card/play multiple cards)
-//        // TODO communicate with server
-//        // TODO frameController.update(), p.update();
-//    }
 }

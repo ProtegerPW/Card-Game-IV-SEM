@@ -5,6 +5,8 @@ import com.company.PanCard;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -239,11 +241,14 @@ public class GameView extends JFrame {
     public class OpponentHandVertical extends JPanel {
         String alignment;
         ArrayList<Rectangle> mapCards;
-
+        //s
         final int CARD_HEIGHT = 80;
         final int CARD_WIDTH = 120;
         final int DELTA_Y = 27;
         final int MARGIN = 20;
+        //
+        final int ROT_DEG_LEFT = -90;
+        final int ROT_DEG_RIGHT = 90;
 
         public OpponentHandVertical(String alignment) {
             setBackground(Color.ORANGE);
@@ -255,15 +260,15 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int xPos = alignment == "left"? MARGIN: getWidth() - MARGIN - CARD_WIDTH;
+            int xPos = alignment.equals("left") ? MARGIN: getWidth() - MARGIN - CARD_WIDTH;
             int handHeight = CARD_HEIGHT + (hand.size() - 1)*DELTA_Y;
-            int yPos = alignment == "left"? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
-            int opponentID = alignment == "left"? playerID: playerID + 2;
+            int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
+            int opponentID = alignment.equals("left") ? playerID: playerID + 2;
             int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
                 Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapCards.add(bounds);
-                yPos = alignment == "left"? yPos - DELTA_Y: yPos + DELTA_Y;
+                yPos = alignment.equals("left") ? yPos - DELTA_Y: yPos + DELTA_Y;
             }
         }
 
@@ -271,15 +276,19 @@ public class GameView extends JFrame {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g.create();
             BufferedImage cardImage = null;
+            BufferedImage rotatedImage = null;
             String path = "../img/background.png";
+            int degrees = alignment.equals("left") ? ROT_DEG_LEFT: ROT_DEG_RIGHT;
             try {
                 cardImage = ImageIO.read(getClass().getResource(path));
+                rotatedImage = new BufferedImage(cardImage.getHeight(), cardImage.getWidth(), cardImage.getType());
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            rotateImage(cardImage, rotatedImage, degrees);
             for(Rectangle bounds: mapCards ) {
                 if (bounds != null) {
-                    g2d.drawImage(cardImage, bounds.x, bounds.y, bounds.width, bounds.height, null);
+                    g2d.drawImage(rotatedImage, bounds.x, bounds.y, bounds.width, bounds.height, null);
                     Graphics2D copy = (Graphics2D) g2d.create();
                     g2d.setColor(Color.BLACK);
                     g2d.draw(bounds);
@@ -288,6 +297,15 @@ public class GameView extends JFrame {
                 }
             }
             g2d.dispose();
+        }
+
+        protected void rotateImage(BufferedImage source, BufferedImage destination, int degrees) {
+            AffineTransform at = new AffineTransform();
+            at.translate((float) source.getHeight()/2, (float) source.getWidth()/2);
+            at.rotate(Math.toRadians(degrees),0,0);
+            at.translate((float) -source.getWidth()/2, (float) -source.getHeight()/2);
+            AffineTransformOp rotateImage = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+            rotateImage.filter(source, destination);
         }
 
         protected void paintCard(Graphics2D g2d, Rectangle bounds) {

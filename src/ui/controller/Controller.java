@@ -18,8 +18,6 @@ public class Controller {
     private Menu menu;
     private GameSetup gameSetup;
     private GameView gameView;
-    //
-    final int PULL_CARD_DELTA_Y = 20;
 
     public Controller(Player player, ClientSideConnection clientSideConnection, Menu menu) {
         this.player = player;
@@ -104,9 +102,10 @@ public class Controller {
     public class PlayerHandListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
+            // TODO if player's turn? continue: return; (enable/disable)
             System.out.println( "Clicked" );    // --delete later
             PanCard clicked = getClickedCard(e);
-            if(clicked == null) {        // if player clicked outside of cards area -> do nothing
+            if(clicked == null) {        // if player clicked no card -> return (do nothing)
                 System.out.println("No cards selected");    // --delete later
                 deselectCard();
                 return;
@@ -119,11 +118,12 @@ public class Controller {
             if(!player.checkMultiCard(clicked)) {        // check if player has all cards of clicked card value
                 System.out.println("Play clicked card");    // if no -> play clicked card   // --delete later
                 deselectCard();
-                // TODO update stockpile, remove card from hand, update player hand
-                player.deleteCardFromHand(clicked);
-                gameView.setHand(player.getHandOfCards());
-                gameView.playerHand.invalidate();
-                gameView.playerHand.repaint();   // update playerHand view
+                // TODO send played card to server
+                // TODO remove card from hand, update stockpile, update player hand
+//                player.deleteCardFromHand(clicked);
+//                gameView.setHand(player.getHandOfCards());
+//                gameView.playerHand.invalidate();
+//                gameView.playerHand.repaint();   // update playerHand view
             }
             else {                // player can play multiple cards
                 System.out.println( "Multiple cards option" );  // --delete later
@@ -138,7 +138,9 @@ public class Controller {
                 }
                 else {       // player clicked another card of the same value -> pull it up
                     gameView.disablePlaySelectedButton();
-                    // TODO add selected card to array, if array full -> send cards to server
+                    // TODO check if already selected? deselect: add selected card to array;
+                    // TODO if array full? continue: return;
+                    // TODO send cards to server
                     // TODO remove all played cards from hand, update stockpile, update player hand
                     player.setSelectedCard(clicked);
                     pullCardDown(selected);
@@ -158,27 +160,6 @@ public class Controller {
         }
     }
 
-    // if there was a card previously selected, deselect it
-    public void deselectCard() {
-        PanCard tmp = player.getSelectedCard();
-        if(tmp != null) {
-            player.setSelectedCard(null);
-            pullCardDown(tmp);
-        }
-    }
-
-    // move card down in playerHand view -> deselect highlighted card
-    public void pullCardDown(PanCard card) {
-        gameView.getMapPlayerHand().get(card).y += PULL_CARD_DELTA_Y;
-        gameView.playerHand.repaint();
-    }
-
-    // move card up in playerHand view -> select clicked card
-    public void pullCardUp(PanCard card) {
-        gameView.getMapPlayerHand().get(card).y -= PULL_CARD_DELTA_Y;
-        gameView.playerHand.repaint();
-    }
-
     private class DrawCardsListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             deselectCard();
@@ -190,13 +171,33 @@ public class Controller {
 
     private class PlaySelectedListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            PanCard tmp = player.getSelectedCard();
-            if(tmp != null) {
-                deselectCard();
-                // TODO play selected card
-                // TODO update player hand, stockpile
-                // TODO next player turn, disable buttons
-            }
+            deselectCard();
+            // TODO play selected card
+            // TODO update player hand, stockpile
+            // TODO next player turn, disable buttons
         }
+    }
+
+    // if there was a card previously selected, deselect it
+    public void deselectCard() {
+        PanCard tmp = player.getSelectedCard();
+        if(tmp != null) {
+            player.setSelectedCard(null);
+            pullCardDown(tmp);
+        }
+    }
+
+    final int PULL_CARD_DELTA_Y = 20;
+
+    // move card down in playerHand view -> deselect highlighted card
+    public void pullCardDown(PanCard card) {
+        gameView.getMapPlayerHand().get(card).y += PULL_CARD_DELTA_Y;
+        gameView.playerHand.repaint();
+    }
+
+    // move card up in playerHand view -> select clicked card
+    public void pullCardUp(PanCard card) {
+        gameView.getMapPlayerHand().get(card).y -= PULL_CARD_DELTA_Y;
+        gameView.playerHand.repaint();
     }
 }

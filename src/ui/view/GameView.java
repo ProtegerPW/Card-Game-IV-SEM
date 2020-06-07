@@ -17,7 +17,7 @@ public class GameView extends JFrame {
     public JPanel opponentHand1;
     public JPanel opponentHand2;
     public JPanel opponentHand3;
-    public JPanel stockpile;
+    public JPanel stockpilePanel;
 
     private JButton drawCardsButton;
     private JButton playSelectedButton;
@@ -27,6 +27,9 @@ public class GameView extends JFrame {
     private int cardCount[];
     private ArrayList<PanCard> hand;
     private Map<PanCard, Rectangle> mapPlayerHand;
+    private ArrayList<PanCard> stockpile;
+    private Map<PanCard, Rectangle> mapStockpile;
+
 
     public GameView(int playerID, ArrayList<PanCard> hand, int cardCount[]) {
         this.playerID = playerID;
@@ -42,7 +45,7 @@ public class GameView extends JFrame {
     private void createUIComponents() {
         playerHand = new PlayerHand();
         opponentHand2 = new OpponentHandHorizontal();
-        stockpile = new Stockpile().getPanel();
+        stockpilePanel = new StockpilePanel();
         if (numOfPlayers == 4) {
             opponentHand1 = new OpponentHandVertical("left");
             opponentHand3 = new OpponentHandVertical("right");
@@ -282,6 +285,62 @@ public class GameView extends JFrame {
                     g2d.draw(bounds);
                     paintCard(copy, bounds);
                     copy.dispose();
+                }
+            }
+            g2d.dispose();
+        }
+
+        protected void paintCard(Graphics2D g2d, Rectangle bounds) {
+            g2d.translate(bounds.x + 5, bounds.y + 5);
+            g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
+        }
+    }
+
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+    public class StockpilePanel extends JPanel {
+        final int CARD_HEIGHT = 180;
+        final int CARD_WIDTH = 120;
+        final int DELTA_X = 40;
+
+        public StockpilePanel() {
+            stockpile = new ArrayList<>();
+            mapStockpile = new HashMap<>(1);
+        }
+
+        @Override
+        public void invalidate() {
+            super.invalidate();
+            mapStockpile.clear();
+            int xPos = (getWidth() - CARD_WIDTH)/2;
+            int yPos = (getHeight() - CARD_HEIGHT)/2;
+            for (PanCard card: stockpile) {
+                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                mapStockpile.put(card, bounds);
+                xPos += DELTA_X;
+            }
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            String path;
+            for(PanCard card: stockpile) {
+                Rectangle bounds = mapStockpile.get(card);
+                if (bounds != null) {
+                    try {
+                        path = "../img/" + card.toString() + ".png";
+                        BufferedImage cardImage;
+                        cardImage = ImageIO.read(getClass().getResource(path));
+                        g2d.drawImage(cardImage, bounds.x, bounds.y, bounds.width, bounds.height, null);
+                        Graphics2D copy = (Graphics2D) g2d.create();
+                        g2d.setColor(Color.BLACK);
+                        g2d.draw(bounds);
+                        paintCard(copy, bounds);
+                        copy.dispose();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             g2d.dispose();

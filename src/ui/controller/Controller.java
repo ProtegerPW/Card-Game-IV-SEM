@@ -41,6 +41,8 @@ public class Controller {
     public void configButtons() {
         if (player.getCurrentPlayer() != player.getPlayerID()) {
             mouseDisable();
+            gameView.disableDrawCardsButton();
+            gameView.disablePlaySelectedButton();
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -51,6 +53,7 @@ public class Controller {
             System.out.println("Mouse disable");
         } else {
             mouseEnable();
+            gameView.enableDrawCardsButton();
             System.out.println("Mouse enable");
         }
     }
@@ -156,32 +159,29 @@ public class Controller {
             }
             else {                // player can play multiple cards
                 System.out.println( "Multiple cards option" );  // --delete later
-                ArrayList<PanCard> selectedCards = player.getSelectedCards();
-                if(selectedCards == null) {             // if there is no card already selected
-                    pullCardUp(clicked);                    // display selection on player's hand
-                    player.pushCardToSelected(clicked);     // mark card as selected
-                    gameView.enablePlaySelectedButton();
-                    return;
-                }
-                for(PanCard card: selectedCards) {
+                for(PanCard card: player.getSelectedCards()) {
                     if (card == clicked) {              // if player clicks a card already selected
                         pullCardDown(clicked);              // deselect card
                         player.removeCardFromSelected(clicked);
+                        if(player.getSelectedCards().size() == 1) gameView.enablePlaySelectedButton();
+                        if(player.getSelectedCards().size() == 0) gameView.disablePlaySelectedButton();
                         return;
                     }
                 }
                 // player clicked another card of the same value -> pull it up
-                gameView.disablePlaySelectedButton();
                 pullCardUp(clicked);                    // display selection on player's hand
                 player.pushCardToSelected(clicked);     // mark card as selected
-                if(player.getSelectedCards().size() == 3 && player.getSelectedCards().get(0).getColorInt() == 0
+                if(player.getSelectedCards().size() == 1) {
+                    gameView.enablePlaySelectedButton();
+                } else {
+                    gameView.disablePlaySelectedButton();
+                }
+                if((player.getSelectedCards().size() == 3 && player.getSelectedCards().get(player.getSelectedCards().size() - 1).getValueInt() == 0)
                 || player.getSelectedCards().size() == 4) {
                     clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
                     configButtons();
                 }
-                // TODO if all cards selected? continue: return;
-                // TODO send cards to server
-                // TODO remove all played cards from hand
+                // TODO if all cards selected? continue: return; You want to return when you have choose four cards?
                 // TODO update stockpile, update player hand (Konrad)
 
             }
@@ -200,15 +200,16 @@ public class Controller {
 
     private class DrawCardsListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
-            // TODO draw cards
+            clientSideConnection.sendCommunicate("drawCards", null);
+            configButtons();
             // TODO update player hand, stockpile (Konrad)
-            // TODO next player turn
-            // TODO disable buttons
         }
     }
 
     private class PlaySelectedListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
+            clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
+            configButtons();
             // TODO play selected card
             // TODO update player hand, stockpile (Konrad)
             // TODO next player turn

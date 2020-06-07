@@ -185,7 +185,7 @@ public class GameServer {
                         readAndUpdateCardStatus(playerID);
                         break;
 
-                    case "drawCard":
+                    case "drawCards":
                         int tempStockSize = 0;
                         if(stockpile.size() > 3) {
                             tempStockSize = 3;

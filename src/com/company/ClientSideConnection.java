@@ -123,8 +123,6 @@ public class ClientSideConnection {
     public void sendCommunicate(String text, ArrayList<PanCard> cards) {
         try {
             System.out.println("sendCommunicate() " + text);
-            int color = 0;
-            int value = 0;
             switch(text) {
                 case "addCards":
                     sendAndDeleteCard(text, cards);
@@ -135,11 +133,7 @@ public class ClientSideConnection {
                     dataOut.flush();
                     int numOfDrawCards = dataIn.readInt();
                     for(int i = 0; i < numOfDrawCards; i++) {
-                        //TODO can be optimized: readInt() into PanCard constructor & new PanCard as argument to addCardToHand()
-                        color = dataIn.readInt();
-                        value = dataIn.readInt();
-                        PanCard tempListOfCard = new PanCard(PanCard.Color.getColor(color),PanCard.Value.getValue(value));
-                        player.addCardToHand(tempListOfCard);
+                        player.addCardToHand(new PanCard(PanCard.Color.getColor(dataIn.readInt()),PanCard.Value.getValue(dataIn.readInt())));
                         player.popStockpile();
                     }
                     player.setNextPlayer();

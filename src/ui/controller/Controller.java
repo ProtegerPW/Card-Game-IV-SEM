@@ -137,38 +137,17 @@ public class Controller {
                 resetSelectedCards();
                 return;
             }
-//            if(!player.checkCardIsValid(clicked)) {       // check if clicked card can be put onto the stockpile
-//                System.out.println("Illegal move");         // --delete later
-//                deselectCard();
-//                return;
-//            }
+            if(!player.checkCardIsValid(clicked)) {       // check if clicked card can be put onto the stockpile
+                System.out.println("Illegal move");         // --delete later
+                resetSelectedCards();
+                return;
+            }
             if(!player.checkMultiCard(clicked)) {        // check if player has all cards of clicked card value
                 System.out.println("Play clicked card");    // if no -> play clicked card   // --delete later
                 resetSelectedCards();
-                clientSideConnection.sendCommunicate("addCards", new ArrayList<PanCard>() {{
-                    add(clicked);
-                }});
+                clientSideConnection.sendCommunicate("addCards", new ArrayList<PanCard>() {{ add(clicked); }});
                 configButtons();
 
-//                Thread t = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        updateStatus();
-//                    }
-//                });
-//                t.start();
-
-//                Thread t = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        while(player.getCurrentPlayer() != player.getPlayerID())
-//                            updateStatus();
-//                    }
-//                });
-//                t.start();
-
-                // TODO send played card to server
-                // TODO remove card from hand
                 // TODO update stockpile, update player hand (Konrad)
 //                player.deleteCardFromHand(clicked);
 //                gameView.setHand(player.getHandOfCards());
@@ -195,6 +174,11 @@ public class Controller {
                 gameView.disablePlaySelectedButton();
                 pullCardUp(clicked);                    // display selection on player's hand
                 player.pushCardToSelected(clicked);     // mark card as selected
+                if(player.getSelectedCards().size() == 3 && player.getSelectedCards().get(0).getColorInt() == 0
+                || player.getSelectedCards().size() == 4) {
+                    clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
+                    configButtons();
+                }
                 // TODO if all cards selected? continue: return;
                 // TODO send cards to server
                 // TODO remove all played cards from hand

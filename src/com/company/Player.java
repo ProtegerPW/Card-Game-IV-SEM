@@ -50,11 +50,17 @@ public class Player {
             } else {
                 currentPlayer--;
             }
+            if(cardCount[currentPlayer - 1] == 0) {
+                setNextPlayer();
+            }
         } else {
             if(cardCount.length == 2 && currentPlayer == 2 || cardCount.length == 4 && currentPlayer == 4) {
                 currentPlayer = 1;
             } else {
                 currentPlayer++;
+            }
+            if(cardCount[currentPlayer - 1] == 0) {
+                setNextPlayer();
             }
         }
     }
@@ -117,7 +123,7 @@ public class Player {
                 multipleCards++;
             }
         }
-        if(card.getValueInt() == 0 && multipleCards == 3) {
+        if(card.getValueInt() == 0 && card.getColorInt() != 0 && multipleCards == 3 ) {
             return true;
         } else if (multipleCards == 4) {
             return true;
@@ -132,18 +138,12 @@ public class Player {
     public void pushStockpile(PanCard card) { stockpile.add(card); }
 
     public boolean checkCardIsValid(PanCard card) {
-        if(stockpile.size() == 0)
-            return checkCardIsHeartNine(card);
+        if(stockpile.size() == 0) return checkCardIsHeartNine(card);
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 
     public boolean checkCardIsHeartNine(PanCard card) {
-        if(card.getColorInt() == 0) {
-            if(card.getValueInt() == 0) {
-                return true;
-            }
-        }
-        return false;
+        return card.getColorInt() == 0 && card.getValueInt() == 0;
     }
 
     public boolean lastColorOnStockpile() {

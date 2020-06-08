@@ -1,7 +1,13 @@
 package com.company;
 
-import java.io.*;
-import java.net.*;
+import converters.ServerJasonConverter;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,9 +22,10 @@ public class GameServer {
     private PanDeck gameDeck;
     private ArrayList<ArrayList<PanCard>> playerHand;
     private ArrayList<PanCard> stockpile;
-    private PanCard.Color validColor;
-    private PanCard.Value validValue;
-
+    //private PanCard.Color validColor;
+    //private PanCard.Value validValue;
+    //private transient ServerJasonConverter gameServerJsonConverter;
+    //final String GameServerJsonFilename;
     private int currentPlayer;
 
     public GameServer() {
@@ -36,7 +43,18 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from GameSever Constructor");
         }
+        //gameServerJsonConverter = new ServerJasonConverter("gameServer.json");
+        //ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(GameServerJsonFilename);
     }
+
+    public GameServer getGameServer() {
+        return this;
+    }
+
+//    public void gameServerToJson() {
+//        gameServerJsonConverter.toJson(getGameServer());
+//        gameServerJsonConverter.fromJson();
+//    }
 
     public int getCurrentPlayer() {
         return currentPlayer;
@@ -99,6 +117,7 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections");
         }
+        System.out.println("Exit connection");
     }
 
     public void closeConnection() {
@@ -255,7 +274,11 @@ public class GameServer {
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     }
-                    if(numConPlayers == 2) continue;
+                    if(numConPlayers == 2) {
+//                        gameServerJsonConverter.toJson(getGameServer());
+//                        gameServerJsonConverter.fromJson().ifPresent(System.out::println);
+                        continue;
+                    }
                     if(playerID == 3) {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
@@ -265,6 +288,8 @@ public class GameServer {
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     }
+//                    gameServerJsonConverter.toJson(getGameServer());
+//                    gameServerJsonConverter.fromJson().ifPresent(System.out::println);
                 }
                 //TODO send info to other player about number of cards in hand
 
@@ -275,10 +300,17 @@ public class GameServer {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         GameServer gs = new GameServer();
         gs.waitForHost();
         gs.acceptConnections();
+        File file = new File("gameServer.json");
+        ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(file.getName());
+        //while (true) {
+//            TimeUnit.SECONDS.sleep(5);
+//            gameServerJsonConverter.toJson(gs);
+//            gameServerJsonConverter.fromJson();
+//        //}
         //gs.closeConnection();
     }
 }

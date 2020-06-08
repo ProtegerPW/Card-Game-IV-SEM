@@ -240,23 +240,31 @@ public class Controller {
     }
 
     public void configButtons() {
-        if (player.getCurrentPlayer() != player.getPlayerID()) {
-            mouseDisable();
-            gameView.disableDrawCardsButton();
-            gameView.disablePlaySelectedButton();
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    updateStatus();
-                }
-            });
-            t.start();
-            System.out.println("Mouse disable");
+        if(!player.checkIsEnd()) {
+            if (player.getCurrentPlayer() != player.getPlayerID()) {
+                mouseDisable();
+                gameView.disableDrawCardsButton();
+                gameView.disablePlaySelectedButton();
+                Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateStatus();
+                    }
+                });
+                t.start();
+                System.out.println("Mouse disable");
+            } else {
+                mouseEnable();
+                if (player.getStockpileSize() >= 2)
+                    gameView.enableDrawCardsButton();
+                System.out.println("Mouse enable");
+            }
         } else {
-            mouseEnable();
-            if(player.getStockpileSize() >= 2)
-                gameView.enableDrawCardsButton();
-            System.out.println("Mouse enable");
+            gameView.disablePlaySelectedButton();
+            gameView.disableDrawCardsButton();
+            mouseDisable();
+            System.out.println("The game session has ended");
+            //TODO print communicate that there are winners
         }
     }
 

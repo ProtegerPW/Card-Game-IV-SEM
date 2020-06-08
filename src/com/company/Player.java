@@ -154,4 +154,17 @@ public class Player {
     }
 
     public void deleteCardFromHand(PanCard card) { handOfCards.remove(card); }
+
+    public boolean checkIsEnd(){
+        int calculateWinners = 0;
+        for(int i = 0; i < cardCount.length; i++) {
+            if(cardCount[i] == 0) calculateWinners++;
+        }
+        if(cardCount.length == 2 && calculateWinners == 1 ||
+           cardCount.length == 4 && calculateWinners == 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

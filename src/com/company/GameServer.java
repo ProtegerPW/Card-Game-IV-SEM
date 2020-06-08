@@ -1,7 +1,5 @@
 package com.company;
 
-import converters.ServerJasonConverter;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -10,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 
 public class GameServer {
@@ -305,11 +304,11 @@ public class GameServer {
         gs.waitForHost();
         gs.acceptConnections();
         File file = new File("gameServer.json");
-        ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(file.getName());
+        //ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(file.getName());
         //while (true) {
-//            TimeUnit.SECONDS.sleep(5);
-//            gameServerJsonConverter.toJson(gs);
-//            gameServerJsonConverter.fromJson();
+            TimeUnit.SECONDS.sleep(5);
+            //gameServerJsonConverter.toJson(gs.getGameServer());
+            //gameServerJsonConverter.fromJson();
 //        //}
         //gs.closeConnection();
     }

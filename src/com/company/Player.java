@@ -1,18 +1,7 @@
 package com.company;
 
-import ui.controller.Controller;
-import ui.view.Menu;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 
 public class Player {
@@ -50,19 +39,17 @@ public class Player {
             } else {
                 currentPlayer--;
             }
-            if(cardCount[currentPlayer - 1] == 0) {
-                setNextPlayer();
-            }
         } else {
             if(cardCount.length == 2 && currentPlayer == 2 || cardCount.length == 4 && currentPlayer == 4) {
                 currentPlayer = 1;
             } else {
                 currentPlayer++;
             }
-            if(cardCount[currentPlayer - 1] == 0) {
-                setNextPlayer();
-            }
         }
+        if(cardCount[currentPlayer - 1] == 0) {
+            setNextPlayer();
+        }
+        System.out.println("Next player is: " + getCurrentPlayer());
     }
 
     public ArrayList<PanCard> getHandOfCards() { return handOfCards; }

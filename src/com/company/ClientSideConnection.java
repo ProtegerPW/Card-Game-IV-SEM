@@ -1,13 +1,10 @@
 package com.company;
 
-import ui.view.GameView;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 //Client connections
 public class ClientSideConnection {
@@ -79,6 +76,7 @@ public class ClientSideConnection {
                 dataOut.writeInt(value);
                 player.pushStockpile(new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value)));
                 player.deleteCardFromHand(cards.get(i));
+                player.changeCardCount(player.getPlayerID(),-1);
             }
             dataOut.flush();
             player.setNextPlayer();

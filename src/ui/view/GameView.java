@@ -86,6 +86,13 @@ public class GameView extends JFrame {
         this.cardCount = cardCount;
     }
 
+    public ArrayList<PanCard> getStockpile() {
+        return stockpile;
+    }
+
+    public void setStockpile(ArrayList<PanCard> stockpile) {
+        this.stockpile = stockpile;
+    }
 
     public JButton getDrawCardsButton() {
         return drawCardsButton;
@@ -123,9 +130,9 @@ public class GameView extends JFrame {
             mapPlayerHand = new HashMap<>(1);
             drawCardsButton = new JButton("draw");
             playSelectedButton = new JButton("play selected card");
-            addButtonsToFrame();
             drawCardsButton.setEnabled(false);
             playSelectedButton.setEnabled(false);
+            addButtonsToFrame();
             setBackground(Color.CYAN);
         }
 
@@ -197,9 +204,10 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int xPos = ((getWidth() - CARD_WIDTH - (hand.size() - 1)*DELTA_X)/2);
+            int index = numOfPlayers == 2? playerID%numOfPlayers: (playerID + 1)%numOfPlayers;
+            int opponentNumberOfCards = cardCount[index];
+            int xPos = ((getWidth() - CARD_WIDTH - (opponentNumberOfCards - 1)*DELTA_X)/2);
             int yPos = MARGIN;
-            int opponentNumberOfCards = cardCount[(playerID + 1)%numOfPlayers];
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
                 Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapCards.add(bounds);
@@ -241,7 +249,7 @@ public class GameView extends JFrame {
     public class OpponentHandVertical extends JPanel {
         String alignment;
         ArrayList<Rectangle> mapCards;
-        //s
+        //
         final int CARD_HEIGHT = 80;
         final int CARD_WIDTH = 120;
         final int DELTA_Y = 27;
@@ -261,10 +269,10 @@ public class GameView extends JFrame {
             super.invalidate();
             mapCards.clear();
             int xPos = alignment.equals("left") ? MARGIN: getWidth() - MARGIN - CARD_WIDTH;
-            int handHeight = CARD_HEIGHT + (hand.size() - 1)*DELTA_Y;
-            int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
             int opponentID = alignment.equals("left") ? playerID: playerID + 2;
             int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
+            int handHeight = CARD_HEIGHT + (opponentNumberOfCards - 1)*DELTA_Y;
+            int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
                 Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapCards.add(bounds);
@@ -317,12 +325,15 @@ public class GameView extends JFrame {
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class StockpilePanel extends JPanel {
+        private ArrayList<PanCard> cardsForDisplay;
         final int CARD_HEIGHT = 180;
         final int CARD_WIDTH = 120;
         final int DELTA_X = 40;
+        final int OVERLAP = 5;
 
         public StockpilePanel() {
             stockpile = new ArrayList<>();
+            cardsForDisplay = new ArrayList<>();
             mapStockpile = new HashMap<>(1);
         }
 
@@ -330,11 +341,26 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapStockpile.clear();
+            cardsForDisplay.clear();
+            PanCard card;
+            Rectangle bounds;
             int xPos = (getWidth() - CARD_WIDTH)/2;
             int yPos = (getHeight() - CARD_HEIGHT)/2;
-            for (PanCard card: stockpile) {
-                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+            int pileSize = stockpile.size();
+            int i = Math.max(pileSize - 4, 0);
+            if(pileSize > 4) {
+                xPos -= OVERLAP;
+                card = stockpile.get(pileSize - 5);
+                bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
                 mapStockpile.put(card, bounds);
+                cardsForDisplay.add(card);
+                xPos += OVERLAP;
+            }
+            for(; i < pileSize; ++i) {
+                card = stockpile.get(i);
+                bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                mapStockpile.put(card, bounds);
+                cardsForDisplay.add(card);
                 xPos += DELTA_X;
             }
         }
@@ -342,9 +368,10 @@ public class GameView extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g.create();
+            Rectangle bounds;
             String path;
-            for(PanCard card: stockpile) {
-                Rectangle bounds = mapStockpile.get(card);
+            for(PanCard card: cardsForDisplay) {
+                bounds = mapStockpile.get(card);
                 if (bounds != null) {
                     try {
                         path = "../img/" + card.toString() + ".png";

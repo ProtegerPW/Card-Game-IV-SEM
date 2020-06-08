@@ -91,6 +91,10 @@ public class Player {
         selectedCards.clear();
     }
 
+    public ArrayList<PanCard> getStockpile() {
+        return stockpile;
+    }
+
     public void initCardCount(int cardNumber) {
         if(6 == cardNumber)
             cardCount = new int[]{6, 6, 6, 6};
@@ -123,12 +127,12 @@ public class Player {
                 multipleCards++;
             }
         }
-        if(card.getValueInt() == 0 && card.getColorInt() != 0 && multipleCards == 3 ) {
-            return true;
-        } else if (multipleCards == 4) {
+        if(stockpile.size() == 0 && multipleCards == 4) {
             return true;
         }
-        return false;
+        if(card.getValueInt() == 0 && card.getColorInt() != 0 && multipleCards == 3 ) {
+            return true;
+        } else return multipleCards == 4;
     }
 
     public int getStockpileSize() { return stockpile.size(); }
@@ -138,7 +142,15 @@ public class Player {
     public void pushStockpile(PanCard card) { stockpile.add(card); }
 
     public boolean checkCardIsValid(PanCard card) {
-        if(stockpile.size() == 0) return checkCardIsHeartNine(card);
+        if(stockpile.size() == 0) {
+            if(selectedCards.size() == 0) {
+                return checkCardIsHeartNine(card);
+            }
+            else if(checkCardIsHeartNine(selectedCards.get(0))) {
+                return card.getValueInt() == 0;
+            }
+            return false;
+        }
         return stockpile.get(stockpile.size() - 1).getValueInt() <= card.getValueInt();
     }
 

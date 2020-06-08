@@ -25,7 +25,7 @@ public class ClientSideConnection {
         try {
             System.out.println("---- Client ----");
             socket = new Socket("localhost", 55557);    // create new connection
-            socket.setSoTimeout(30*1000);                         // set idle time to 30 seconds
+            // socket.setSoTimeout(30*1000);                         // set idle time to 30 seconds
             dataIn = new DataInputStream(socket.getInputStream());
             dataOut = new DataOutputStream(socket.getOutputStream());
             System.out.println("Constructed");
@@ -103,7 +103,6 @@ public class ClientSideConnection {
                     player.changeCardCount(player.getCurrentPlayer(), -1);
                 }
             }
-            player.setNextPlayer();
         } catch(IOException ex) {
             System.out.println(" IOException from receiveUpdate() ");
         }

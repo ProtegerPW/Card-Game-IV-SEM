@@ -16,8 +16,8 @@
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="7" anchor="2" fill="1" indent="0" use-parent-layout="true">
-            <minimum-size width="960" height="300"/>
-            <preferred-size width="960" height="300"/>
+            <minimum-size width="960" height="250"/>
+            <preferred-size width="960" height="250"/>
             <maximum-size width="-1" height="300"/>
           </grid>
         </constraints>

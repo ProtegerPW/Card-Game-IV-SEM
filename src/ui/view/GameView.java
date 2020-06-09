@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,6 +25,8 @@ public class GameView extends JFrame {
     private JButton drawCardsButton;
     private JButton playSelectedButton;
 
+    private int currentPlayer;
+
     private int numOfPlayers;
     private int playerID;
     private int cardCount[];
@@ -33,8 +36,9 @@ public class GameView extends JFrame {
     private Map<PanCard, Rectangle> mapStockpile;
 
 
-    public GameView(int playerID, ArrayList<PanCard> hand, int cardCount[]) {
+    public GameView(int playerID, int currentPlayer, ArrayList<PanCard> hand, int cardCount[]) {
         this.playerID = playerID;
+        this.currentPlayer = currentPlayer;
         this.hand = hand;
         this.cardCount = cardCount;
         numOfPlayers = this.cardCount.length;
@@ -94,6 +98,10 @@ public class GameView extends JFrame {
         this.stockpile = stockpile;
     }
 
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
     public JButton getDrawCardsButton() {
         return drawCardsButton;
     }
@@ -121,10 +129,16 @@ public class GameView extends JFrame {
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class PlayerHand extends JPanel {
-        final int CARD_HEIGHT = 180;
-        final int CARD_WIDTH = 120;
-        final int DELTA_X = 40;
-        final int MARGIN = 20;
+        int cardHeight;
+        int cardWidth;
+        int deltaX;
+        int bottomMargin;
+
+        final int SMALL_BOTTOM = 10;
+        final int BOTTOM = 20;
+        final int TOP_MARGIN = 50;
+        final int SIDE_MARGIN = 10;
+        final int MAX_CARD_HEIGHT = 230;
 
         public PlayerHand() {
             mapPlayerHand = new HashMap<>(1);
@@ -145,12 +159,20 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapPlayerHand.clear();
-            int xPos = ((getWidth() - CARD_WIDTH - (hand.size() - 1)*DELTA_X)/2);
-            int yPos = getHeight() - MARGIN - CARD_HEIGHT;
+            if(hand.size() == 0)
+                return;
+            //
+            bottomMargin = getHeight() < 200? SMALL_BOTTOM : BOTTOM;
+            cardHeight = Math.min(getHeight() - TOP_MARGIN - bottomMargin, MAX_CARD_HEIGHT);
+            cardWidth = 2 * cardHeight / 3;
+            deltaX = Math.min(2 * cardHeight / 9, (getWidth() - 2 * SIDE_MARGIN - cardWidth)/hand.size());
+            //
+            int xPos = ((getWidth() - cardWidth - (hand.size() - 1)* deltaX)/2);
+            int yPos = getHeight() - bottomMargin - cardHeight;
             for (PanCard card: hand) {
-                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapPlayerHand.put(card, bounds);
-                xPos += DELTA_X;
+                xPos += deltaX;
             }
         }
 
@@ -190,10 +212,14 @@ public class GameView extends JFrame {
     public class OpponentHandHorizontal extends JPanel {
         private ArrayList<Rectangle> mapCards;
 
-        final int CARD_HEIGHT = 120;
-        final int CARD_WIDTH = 80;
-        final int DELTA_X = 27;
+        int cardHeight;
+        int cardWidth;
+        int deltaX;
+        int margin;
+
+        final int SMALL_MARGIN = 10;
         final int MARGIN = 20;
+        final int MAX_CARD_HEIGHT = 160;
 
         public OpponentHandHorizontal() {
             mapCards = new ArrayList<>();
@@ -204,14 +230,20 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int index = numOfPlayers == 2? playerID%numOfPlayers: (playerID + 1)%numOfPlayers;
+            //
+            margin = getHeight() < 140? SMALL_MARGIN : MARGIN;
+            cardHeight = Math.min(getHeight() - 2 * margin, MAX_CARD_HEIGHT);
+            cardWidth = 2 * cardHeight / 3;
+            deltaX = 2 * cardHeight / 9;
+            //
+            int index = numOfPlayers == 2? playerID % numOfPlayers : (playerID + 1) % numOfPlayers;
             int opponentNumberOfCards = cardCount[index];
-            int xPos = ((getWidth() - CARD_WIDTH - (opponentNumberOfCards - 1)*DELTA_X)/2);
-            int yPos = MARGIN;
+            int xPos = ((getWidth() - cardWidth - (opponentNumberOfCards - 1)* deltaX)/2);
+            int yPos = margin;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
-                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapCards.add(bounds);
-                xPos += DELTA_X;
+                xPos += deltaX;
             }
         }
 
@@ -250,11 +282,14 @@ public class GameView extends JFrame {
         String alignment;
         ArrayList<Rectangle> mapCards;
         //
-        final int CARD_HEIGHT = 80;
-        final int CARD_WIDTH = 120;
-        final int DELTA_Y = 27;
-        final int MARGIN = 20;
+        int cardHeight;
+        int cardWidth;
+        int deltaY;
+        int margin;
         //
+        final int SMALL_MARGIN = 10;
+        final int MARGIN = 20;
+        final int MAX_CARD_WIDTH = 160;
         final int ROT_DEG_LEFT = -90;
         final int ROT_DEG_RIGHT = 90;
 
@@ -268,15 +303,21 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int xPos = alignment.equals("left") ? MARGIN: getWidth() - MARGIN - CARD_WIDTH;
+            //
+            margin = getWidth() < 140? SMALL_MARGIN : MARGIN;
+            cardWidth = Math.min(getWidth() - 2 * margin, MAX_CARD_WIDTH);
+            cardHeight = 2 * cardWidth / 3;
+            deltaY = 2 * cardWidth / 9;
+            //
+            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
             int opponentID = alignment.equals("left") ? playerID: playerID + 2;
             int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
-            int handHeight = CARD_HEIGHT + (opponentNumberOfCards - 1)*DELTA_Y;
-            int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - CARD_HEIGHT: (getHeight() - handHeight)/2;
+            int handHeight = cardHeight + (opponentNumberOfCards - 1) * deltaY;
+            int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - cardHeight : (getHeight() - handHeight)/2;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
-                Rectangle bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapCards.add(bounds);
-                yPos = alignment.equals("left") ? yPos - DELTA_Y: yPos + DELTA_Y;
+                yPos = alignment.equals("left") ? yPos - deltaY : yPos + deltaY;
             }
         }
 
@@ -293,6 +334,7 @@ public class GameView extends JFrame {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            assert cardImage != null;
             rotateImage(cardImage, rotatedImage, degrees);
             for(Rectangle bounds: mapCards ) {
                 if (bounds != null) {
@@ -325,16 +367,25 @@ public class GameView extends JFrame {
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class StockpilePanel extends JPanel {
-        private ArrayList<PanCard> cardsForDisplay;
-        final int CARD_HEIGHT = 180;
-        final int CARD_WIDTH = 120;
-        final int DELTA_X = 40;
+        private final ArrayList<PanCard> cardsForDisplay;
+        private Path2D turnIcon;
+        //
+        int cardHeight;
+        int cardWidth;
+        int deltaX;
+
         final int OVERLAP = 5;
+        final int MARGIN = 20;
+        final int PILE_MARGIN = 50;
+        final int MAX_CARD_HEIGHT = 180;
+        final int TURN_ICON_WIDTH = 40;
+        final int TURN_ICON_HEIGHT = 20;
 
         public StockpilePanel() {
             stockpile = new ArrayList<>();
             cardsForDisplay = new ArrayList<>();
             mapStockpile = new HashMap<>(1);
+            turnIcon = new Path2D.Double();
         }
 
         @Override
@@ -344,25 +395,32 @@ public class GameView extends JFrame {
             cardsForDisplay.clear();
             PanCard card;
             Rectangle bounds;
-            int xPos = (getWidth() - CARD_WIDTH)/2;
-            int yPos = (getHeight() - CARD_HEIGHT)/2;
+            turnIcon.reset();
+            //
+            cardHeight = Math.min(getHeight() - 2 * PILE_MARGIN, MAX_CARD_HEIGHT);
+            cardWidth = 2 * cardHeight / 3;
+            deltaX = 2 * cardHeight / 9;
+            //
+            int xPos = (getWidth() - cardWidth)/2;
+            int yPos = (getHeight() - cardHeight)/2;
             int pileSize = stockpile.size();
             int i = Math.max(pileSize - 4, 0);
             if(pileSize > 4) {
                 xPos -= OVERLAP;
                 card = stockpile.get(pileSize - 5);
-                bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapStockpile.put(card, bounds);
                 cardsForDisplay.add(card);
                 xPos += OVERLAP;
             }
             for(; i < pileSize; ++i) {
                 card = stockpile.get(i);
-                bounds = new Rectangle(xPos, yPos, CARD_WIDTH, CARD_HEIGHT);
+                bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
                 mapStockpile.put(card, bounds);
                 cardsForDisplay.add(card);
-                xPos += DELTA_X;
+                xPos += deltaX;
             }
+            getTurnIcon();
         }
 
         protected void paintComponent(Graphics g) {
@@ -388,6 +446,11 @@ public class GameView extends JFrame {
                     }
                 }
             }
+            // draw icon
+            g2d.setColor(Color.GREEN);
+            g2d.fill(turnIcon);
+            g2d.setColor(Color.BLACK);
+            g2d.draw(turnIcon);
             g2d.dispose();
         }
 
@@ -395,5 +458,67 @@ public class GameView extends JFrame {
             g2d.translate(bounds.x + 5, bounds.y + 5);
             g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
         }
+
+        private void getTurnIcon() {
+            int posX, posY, iconPosition;
+            if(numOfPlayers == 2) {
+                if(currentPlayer == playerID)
+                    iconPosition = 0;
+                else
+                    iconPosition = 2;
+            }
+            else {
+                iconPosition = currentPlayer - playerID;
+                iconPosition += iconPosition < 0 ? 4 : 0;
+            }
+            switch(iconPosition) {
+                case 0:
+                    posX = (getWidth() - TURN_ICON_WIDTH)/2;
+                    posY = getHeight() - TURN_ICON_HEIGHT - MARGIN;
+                    turnIcon.moveTo(posX, posY);
+                    turnIcon.lineTo(posX + TURN_ICON_WIDTH, posY);
+                    turnIcon.lineTo(posX + TURN_ICON_WIDTH/2, posY + TURN_ICON_HEIGHT);
+                    turnIcon.closePath();
+                    break;
+
+                case 1:
+                    posX = TURN_ICON_HEIGHT + MARGIN;
+                    posY = (getHeight() - TURN_ICON_WIDTH)/2;
+                    turnIcon.moveTo(posX, posY);
+                    turnIcon.lineTo(posX, posY + TURN_ICON_WIDTH);
+                    turnIcon.lineTo(posX - TURN_ICON_HEIGHT, posY + TURN_ICON_WIDTH/2);
+                    turnIcon.closePath();
+                    break;
+
+                case 2:
+                    posX = (getWidth() - TURN_ICON_WIDTH)/2;
+                    posY = TURN_ICON_HEIGHT + MARGIN;
+                    turnIcon.moveTo(posX, posY);
+                    turnIcon.lineTo(posX + TURN_ICON_WIDTH, posY);
+                    turnIcon.lineTo(posX + TURN_ICON_WIDTH/2, posY - TURN_ICON_HEIGHT);
+                    turnIcon.closePath();
+                    break;
+
+                case 3:
+                    posX = getWidth() - TURN_ICON_HEIGHT - MARGIN;
+                    posY = (getHeight() - TURN_ICON_WIDTH)/2;
+                    turnIcon.moveTo(posX, posY);
+                    turnIcon.lineTo(posX, posY + TURN_ICON_WIDTH);
+                    turnIcon.lineTo(posX + TURN_ICON_HEIGHT, posY + TURN_ICON_WIDTH/2);
+                    turnIcon.closePath();
+                    break;
+            }
+        }
+    }
+
+    public void showEndGameWindow() {
+        // TODO
+        //String message = "Game Finished - Player #" + currentPlayer + "lost.";
+        //int option = JOptionPane.showMessageDialog(this,  message, "Game finished.");
+//        if (option == JOptionPane.YES_OPTION)
+//            new_game = true;
+//        else if (option == JOptionPane.NO_OPTION || option == JOptionPane.CANCEL_OPTION
+//                || option == JOptionPane.CLOSED_OPTION)
+//            new_game = false;
     }
 }

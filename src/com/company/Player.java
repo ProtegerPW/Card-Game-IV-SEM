@@ -64,8 +64,6 @@ public class Player {
 
     public int[] getCardCount() { return cardCount; }
 
-    public void setCardCount(int[] cardCount) { this.cardCount = cardCount; }
-
     public ArrayList<PanCard> getSelectedCards() { return selectedCards; }
 
     public void pushCardToSelected(PanCard clickedCard) { this.selectedCards.add(clickedCard); }
@@ -89,8 +87,8 @@ public class Player {
             cardCount = new int[]{12, 12};
     }
 
-    public void changeCardCount(int playerID, int direction) {
-        if (direction < 0) {
+    public void setCardCount(int playerID, int change) {
+        if (change < 0) {
             this.cardCount[playerID - 1]--;
         } else {
             this.cardCount[playerID - 1]++;
@@ -107,7 +105,7 @@ public class Player {
         }
     }
 
-    public boolean checkMultiCard(PanCard card) {   // TODO 3 dziewiątki bez kieru / 4 dziewiątki z kierem
+    public boolean checkMultiCard(PanCard card) {
         int multipleCards = 0;
         for(int i = 0; i < handOfCards.size(); i++) {
             if(card.getValueInt() == handOfCards.get(i).getValueInt()) {

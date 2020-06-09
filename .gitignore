@@ -4,3 +4,4 @@ plan
 player.jar
 server.jar
 src/ui/view/SimpleCards.java
+gameServer.json

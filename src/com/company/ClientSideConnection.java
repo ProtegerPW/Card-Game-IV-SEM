@@ -76,7 +76,7 @@ public class ClientSideConnection {
                 dataOut.writeInt(value);
                 player.pushStockpile(new PanCard(PanCard.Color.getColor(color), PanCard.Value.getValue(value)));
                 player.deleteCardFromHand(cards.get(i));
-                player.changeCardCount(player.getPlayerID(),-1);
+                player.setCardCount(player.getPlayerID(),-1);
             }
             dataOut.flush();
             player.setNextPlayer();
@@ -93,12 +93,12 @@ public class ClientSideConnection {
                 for(int i = 0; i < 3; i++) {
                     if(player.getStockpileSize() == 1) break;
                     player.popStockpile();
-                    player.changeCardCount(player.getCurrentPlayer(), 1);
+                    player.setCardCount(player.getCurrentPlayer(), 1);
                 }
             } else {
                 for(int i = 0; i < numOfCards; i++) {
                     player.pushStockpile(readCard());
-                    player.changeCardCount(player.getCurrentPlayer(), -1);
+                    player.setCardCount(player.getCurrentPlayer(), -1);
                 }
             }
         } catch(IOException ex) {
@@ -132,6 +132,7 @@ public class ClientSideConnection {
                     for(int i = 0; i < numOfDrawCards; i++) {
                         player.addCardToHand(new PanCard(PanCard.Color.getColor(dataIn.readInt()),PanCard.Value.getValue(dataIn.readInt())));
                         player.popStockpile();
+                        player.setCardCount(player.getPlayerID(), 1);
                     }
                     player.setNextPlayer();
                     player.sortHand();

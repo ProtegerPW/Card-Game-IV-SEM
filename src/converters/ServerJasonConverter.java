@@ -1,8 +1,6 @@
 package converters;
 
-import com.company.GameServer;
-
-public class ServerJasonConverter extends JsonConverter<GameServer> {
+public class ServerJasonConverter extends JsonConverter<ServerConverter> {
 
     public ServerJasonConverter(String jsonFilename) {
         super(jsonFilename);

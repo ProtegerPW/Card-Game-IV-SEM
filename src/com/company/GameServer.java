@@ -1,14 +1,15 @@
 package com.company;
 
+import converters.ServerConverter;
+import converters.ServerJasonConverter;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 
 public class GameServer {
@@ -21,10 +22,7 @@ public class GameServer {
     private PanDeck gameDeck;
     private ArrayList<ArrayList<PanCard>> playerHand;
     private ArrayList<PanCard> stockpile;
-    //private PanCard.Color validColor;
-    //private PanCard.Value validValue;
-    //private transient ServerJasonConverter gameServerJsonConverter;
-    //final String GameServerJsonFilename;
+    private ServerJasonConverter gameServerJsonConverter;
     private int currentPlayer;
 
     public GameServer() {
@@ -42,26 +40,23 @@ public class GameServer {
         } catch (IOException ex) {
             System.out.println("IOException from GameSever Constructor");
         }
-        //gameServerJsonConverter = new ServerJasonConverter("gameServer.json");
-        //ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(GameServerJsonFilename);
     }
 
     public GameServer getGameServer() {
         return this;
     }
 
-//    public void gameServerToJson() {
-//        gameServerJsonConverter.toJson(getGameServer());
-//        gameServerJsonConverter.fromJson();
-//    }
-
     public int getCurrentPlayer() {
         return currentPlayer;
     }
 
-    public void setCurrentPlayer(int currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
+    public void setCurrentPlayer(int currentPlayer) { this.currentPlayer = currentPlayer; }
+
+    public int getNumOfPlayers() { return this.numPlayers; };
+
+    public ArrayList<ArrayList<PanCard>> getPlayerHand() { return this.playerHand; }
+
+    public ArrayList<PanCard> getStockpile() { return this.stockpile; }
 
     public void waitForHost() {
         try {
@@ -138,6 +133,11 @@ public class GameServer {
         }
     }
 
+    public void saveToJson(){
+        gameServerJsonConverter = new ServerJasonConverter("gameServer.json");
+        gameServerJsonConverter.toJson(new ServerConverter(getGameServer()));
+    }
+
     private class ServerSideConnection implements Runnable {
         private Socket socket;
         private DataInputStream dataIn;
@@ -156,7 +156,7 @@ public class GameServer {
         }
 
         public void deleteCardFromHand(PanCard card, int playerID) {
-            if(playerHand.get(playerID - 1).contains(card)) playerHand.remove(card);
+            if(playerHand.get(playerID - 1).contains(card)) { playerHand.get(playerID - 1).remove(card); }
         }
 
         public void drawCard(int playerID, int numOfCards) {
@@ -196,6 +196,7 @@ public class GameServer {
         }
 
         public void performOperation(String text, int playerID) {
+            setCurrentPlayer(playerID);
             try {
                 switch (text) {
 
@@ -274,8 +275,7 @@ public class GameServer {
                         performOperation(readText, playerID);
                     }
                     if(numConPlayers == 2) {
-//                        gameServerJsonConverter.toJson(getGameServer());
-//                        gameServerJsonConverter.fromJson().ifPresent(System.out::println);
+                        saveToJson();
                         continue;
                     }
                     if(playerID == 3) {
@@ -287,8 +287,7 @@ public class GameServer {
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
                     }
-//                    gameServerJsonConverter.toJson(getGameServer());
-//                    gameServerJsonConverter.fromJson().ifPresent(System.out::println);
+                    saveToJson();
                 }
                 //TODO send info to other player about number of cards in hand
 
@@ -303,13 +302,6 @@ public class GameServer {
         GameServer gs = new GameServer();
         gs.waitForHost();
         gs.acceptConnections();
-        File file = new File("gameServer.json");
-        //ServerJasonConverter gameServerJsonConverter = new ServerJasonConverter(file.getName());
-        //while (true) {
-            TimeUnit.SECONDS.sleep(5);
-            //gameServerJsonConverter.toJson(gs.getGameServer());
-            //gameServerJsonConverter.fromJson();
-//        //}
         //gs.closeConnection();
     }
 }

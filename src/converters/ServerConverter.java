@@ -13,6 +13,14 @@ public class ServerConverter {
     private ArrayList<ArrayList<PanCard>> playerHand;
 
 
+    public ArrayList<PanCard> getStockpile() {
+        return stockpile;
+    }
+
+    public ArrayList<ArrayList<PanCard>> getPlayerHand() {
+        return playerHand;
+    }
+
     public ServerConverter(GameServer gameSever) {
         numOfPlayers = gameSever.getNumOfPlayers();
         currentPlayer = gameSever.getCurrentPlayer();

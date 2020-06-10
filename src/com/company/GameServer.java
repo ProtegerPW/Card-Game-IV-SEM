@@ -1,10 +1,12 @@
 package com.company;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import converters.ServerConverter;
 import converters.ServerJasonConverter;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -132,10 +134,44 @@ public class GameServer {
             }
         }
     }
+//test class to implement ObjectMapper to read from .json file and create Object in Java
+//    public class ItemDeserializer extends StdDeserializer<ServerConverter> {
+//
+//        public ItemDeserializer() {
+//            this(null);
+//        }
+//
+//        public ItemDeserializer(Class<?> vc) {
+//            super(vc);
+//        }
+//
+//        @Override
+//        public ServerConverter deserialize(JsonParser jp, DeserializationContext ctxt)
+//                throws IOException, JsonProcessingException {
+//            JsonNode node = jp.getCodec().readTree(jp);
+//            int numOfPlayers = (Integer) ((IntNode) node.get("numOfPlayers")).numberValue();
+//            int currentPlayer = (Integer) ((IntNode) node.get("currentPlayer")).numberValue();
+//            //JSONArray stockpile
+//            String itemName = node.get("itemName").
+//            int userId = (Integer) ((IntNode) node.get("createdBy")).numberValue();
+//
+//            return new Item(id, itemName, new User(userId, null));
+//        }
+//    }
 
-    public void saveToJson(){
+    public void saveToJson() throws IOException {
         gameServerJsonConverter = new ServerJasonConverter("gameServer.json");
         gameServerJsonConverter.toJson(new ServerConverter(getGameServer()));
+        //gameServerJsonConverter.fromJson().ifPresent(System.out::println);
+//        Gson g = new Gson();
+//        ServerConverter tempServer = g.fromJson("gameServer.json", ServerConverter.class);
+//        System.out.println("Num of cards on stockpile is " + tempServer.getStockpile().size());
+//        System.out.println("Num of cards for player #1 :" + tempServer.getPlayerHand().get(0).size());
+        //Objectmapper tempMapper;
+        ObjectMapper mapper = new ObjectMapper();
+        ServerConverter tempServer = mapper.readValue(new File("/home/jakub/IdeaProjects/newCardGame"), ServerConverter.class);
+        System.out.println("Num of cards on stockpile is " + tempServer.getStockpile().size());
+        System.out.println("Num of cards for player #1 :" + tempServer.getPlayerHand().get(0).size());
     }
 
     private class ServerSideConnection implements Runnable {

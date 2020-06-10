@@ -221,31 +221,23 @@ public class Controller {
             mouseDisable();
             System.out.println("The game session has ended");   // --log
             boolean newGame = gameView.endGameWindow();     // display new game option panel, wait for player response
-            if(newGame == true) {
-                // TODO
+            if(newGame) {
                 clientSideConnection.sendCommunicate("Yes",null);
                 if("No".equals(clientSideConnection.getdataInUTF())) {
                     gameView.dispose();
-                    return;
                 } else {
                     clientSideConnection.getPlayerInitialHand();
-                    //gameView.dispose();
-                    initGameView();
-                    //updateGameState();
+                    resetGameView();
                 }
             }
             else {
-                // TODO
                 clientSideConnection.sendCommunicate("No",null);
                 gameView.dispose();
             }
-            //TODO if() send Yes or No based on clicked Button
-            //TODO if() YES -> initGameSetup
-            //TODO if() NO -> closeConnection
         }
     }
 
-        // update game view after any opponent's turn
+           // update game view after any opponent's turn
     public void updateStatus() {
         clientSideConnection.receiveUpdate();
         updateOpponentHands();
@@ -295,6 +287,14 @@ public class Controller {
             gameView.opponentHand3.invalidate();
             gameView.opponentHand3.repaint();
         }
+    }
+
+        // reset view after a new game is launched
+    public void resetGameView() {
+        updatePlayerHand();
+        updateStockpile();
+        updateOpponentHands();
+        updateGameState();
     }
 
     public void mouseEnable() {

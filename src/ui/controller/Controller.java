@@ -223,9 +223,21 @@ public class Controller {
             boolean newGame = gameView.endGameWindow();     // display new game option panel, wait for player response
             if(newGame == true) {
                 // TODO
+                clientSideConnection.sendCommunicate("Yes",null);
+                if("No".equals(clientSideConnection.getdataInUTF())) {
+                    gameView.dispose();
+                    return;
+                } else {
+                    clientSideConnection.getPlayerInitialHand();
+                    //gameView.dispose();
+                    initGameView();
+                    //updateGameState();
+                }
             }
             else {
                 // TODO
+                clientSideConnection.sendCommunicate("No",null);
+                gameView.dispose();
             }
             //TODO if() send Yes or No based on clicked Button
             //TODO if() YES -> initGameSetup

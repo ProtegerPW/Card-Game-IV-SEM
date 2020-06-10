@@ -332,7 +332,6 @@ public class GameServer {
 
         public void run() {
             try {
-                System.out.println("Start new thread for " + playerID);
                 int numOfCards = (gameDeck.getLength() / numPlayers);
                 dataOut.writeInt(numOfCards);
                 dataOut.flush();
@@ -403,7 +402,7 @@ public class GameServer {
                 t.start();
                 TimeUnit.SECONDS.sleep(60);
                 numOfAnswer = 0;
-            } catch (IOException | InterruptedException ex) {
+            } catch (IOException | InterruptedException ex )/*| (InterruptedException ex)*/ {
                 System.out.println("IOException from run() SSC");
             }
             System.out.println("End of thread " + playerID);

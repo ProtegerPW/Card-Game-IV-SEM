@@ -157,8 +157,7 @@ public class GameView extends JFrame {
             drawCardsButton.setEnabled(false);
             playSelectedButton.setEnabled(false);
             addElementsToFrame();
-
-            setBackground(Color.CYAN);
+            //setBackground(Color.CYAN);
         }
 
         public void addElementsToFrame() {
@@ -234,7 +233,7 @@ public class GameView extends JFrame {
 
         public OpponentHandHorizontal() {
             mapCards = new ArrayList<>();
-            setBackground(Color.MAGENTA);
+            //setBackground(Color.MAGENTA);
         }
 
         @Override
@@ -309,14 +308,13 @@ public class GameView extends JFrame {
         public OpponentHandVertical(String alignment) {
             mapCards = new ArrayList<>();
             this.alignment = alignment;
-            setBackground(Color.ORANGE);
+            //setBackground(Color.ORANGE);
         }
 
         @Override
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
             int opponentID = alignment.equals("left") ? playerID: playerID + 2;
             int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
             if(opponentNumberOfCards == 0) {
@@ -324,6 +322,7 @@ public class GameView extends JFrame {
             }
             //
             margin = getWidth() < 140? SMALL_MARGIN : MARGIN;
+            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
             cardWidth = Math.min(getWidth() - 2 * margin, MAX_CARD_WIDTH);
             cardHeight = 2 * cardWidth / 3;
             deltaY = Math.min(2 * cardWidth / 9, (getHeight() - 2 * SMALL_MARGIN - cardHeight)/opponentNumberOfCards);
@@ -405,7 +404,7 @@ public class GameView extends JFrame {
             mapStockpile = new HashMap<>(1);
             turnIcon = new Path2D.Double();
             setLabels();
-            setBackground(Color.YELLOW);
+            //setBackground(Color.YELLOW);
         }
 
         @Override
@@ -468,7 +467,7 @@ public class GameView extends JFrame {
                 }
             }
             // draw icon
-            g2d.setColor(Color.GREEN);
+            g2d.setColor(Color.YELLOW);
             g2d.fill(turnIcon);
             g2d.setColor(Color.BLACK);
             g2d.draw(turnIcon);

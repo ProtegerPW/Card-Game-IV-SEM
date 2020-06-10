@@ -11,12 +11,14 @@ class PlayerTest {
     void setNextPlayer() {
         //TODO has to make test based on created stockpile
         Player tempPlayer = new Player();
+        tempPlayer.pushStockpile(new PanCard(PanCard.Color.getColor(1), PanCard.Value.getValue(0)));
         tempPlayer.initCardCount(6); //it means there are 4 players
         tempPlayer.setCurrentPlayer(1);
         for(int i = 7; i > 0; i--) {
             tempPlayer.setNextPlayer();    //in descending order
             Assert.assertEquals(((i % 4) + 1), tempPlayer.getCurrentPlayer());
         }
+        tempPlayer.pushStockpile(new PanCard(PanCard.Color.getColor(0), PanCard.Value.getValue(0)));
         tempPlayer.setCurrentPlayer(1);
         for(int i = 1; i < 10; i++) {
             tempPlayer.setNextPlayer(); //in ascending order
@@ -25,11 +27,13 @@ class PlayerTest {
 
         Player tempPlayerTwo = new Player();
         tempPlayerTwo.initCardCount(12); //it means there are 2 players
+        tempPlayerTwo.pushStockpile(new PanCard(PanCard.Color.getColor(1), PanCard.Value.getValue(0)));
         tempPlayerTwo.setCurrentPlayer(1);
         for(int i = 3; i > 0; i--) {
             tempPlayerTwo.setNextPlayer();     //in descending order
             Assert.assertEquals(((i % 2) + 1), tempPlayerTwo.getCurrentPlayer());
         }
+        tempPlayerTwo.pushStockpile(new PanCard(PanCard.Color.getColor(0), PanCard.Value.getValue(0)));
         tempPlayerTwo.setCurrentPlayer(1);
         for(int i = 1; i < 10; i++) {
             tempPlayerTwo.setNextPlayer();     //in ascending order
@@ -135,9 +139,9 @@ class PlayerTest {
             tempPlayer.pushStockpile(new PanCard(PanCard.Color.getColor(i), PanCard.Value.getValue(i)));
         }
         tempPlayer.popStockpile();
-        Assert.assertNotEquals(1,tempPlayer.lastColorOnStockpile());
+        Assert.assertFalse(tempPlayer.lastColorOnStockpile());
         tempPlayer.popStockpile();
-        Assert.assertEquals(1,tempPlayer.lastColorOnStockpile());
+        Assert.assertTrue(tempPlayer.lastColorOnStockpile());
     }
 
     @Test

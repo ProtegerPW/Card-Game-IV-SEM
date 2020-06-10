@@ -36,6 +36,12 @@ public class ClientSideConnection {
         // obtain initial hand from server
     public void getPlayerInitialHand() {
         try {
+            if(player.getHandOfCards() != null) {
+                player.resetHandOfCards();
+            }
+            if(player.getStockpile() != null) {
+                player.resetStockpile();
+            }
             int cardNumber = dataIn.readInt();
             System.out.println("number of cards " + cardNumber );
             player.initCardCount(cardNumber);
@@ -52,6 +58,15 @@ public class ClientSideConnection {
         } catch (IOException ex) {
             System.out.println("IOException from readCards() ");
         }
+    }
+
+    public String getdataInUTF() {
+        try {
+            return this.dataIn.readUTF();
+        } catch (IOException ex) {
+            System.out.println("IOException from getDataInUTF() ");
+        }
+        return "Yes";
     }
 
         // send players number to server
@@ -139,12 +154,11 @@ public class ClientSideConnection {
                     break;
 
                 case "Yes":
-                    dataOut.writeUTF(text);
-                    dataOut.flush();
 
                 case "No":
                     dataOut.writeUTF(text);
                     dataOut.flush();
+                    break;
             }
 
         } catch(IOException ex){

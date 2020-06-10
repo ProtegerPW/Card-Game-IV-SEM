@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 
 public class GameServer {
@@ -76,6 +77,7 @@ public class GameServer {
             playerHand.add(hand);
             System.out.println("Created hand #" + (i + 1));
         }
+        setFirstPlayer();
     }
 
     public void waitForHost() {
@@ -99,7 +101,7 @@ public class GameServer {
 //                playerHand.add(hand);
 //                System.out.println("Created hand #" + (i + 1));
 //            }
-            setFirstPlayer();
+            //setFirstPlayer();
             numConPlayers++;
             Thread t = new Thread(ssc);
             t.start();
@@ -330,6 +332,7 @@ public class GameServer {
 
         public void run() {
             try {
+                System.out.println("Start new thread for " + playerID);
                 int numOfCards = (gameDeck.getLength() / numPlayers);
                 dataOut.writeInt(numOfCards);
                 dataOut.flush();
@@ -343,48 +346,67 @@ public class GameServer {
                 dataOut.flush();
 
                 while(true) {
-                    if(playerID == 1) {
-                        String readText = dataIn.readUTF();
-                        System.out.println("Receive text from " + playerID + ": " + readText);
-                        performOperation(readText, playerID);
-                        if(readText == "Yes" || readText == "No") { break; }
-                    } else if(playerID == 2) {
-                        String readText = dataIn.readUTF();
-                        System.out.println("Receive text from " + playerID + ": " + readText);
-                        performOperation(readText, playerID);
-                        if(readText == "Yes" || readText == "No") { break; }
+                    String readText = dataIn.readUTF();
+                    System.out.println("Receive text from " + playerID + ": " + readText);
+                    performOperation(readText, playerID);
+                    if(readText.equals("Yes") || readText.equals("No")) {
+                        System.out.println("Break statement");
+                        break;
                     }
-                    if(numConPlayers == 2) {
-                        saveToJson();
-                        continue;
-                    }
-                    if(playerID == 3) {
-                        String readText = dataIn.readUTF();
-                        System.out.println("Receive text from " + playerID + ": " + readText);
-                        performOperation(readText, playerID);
-                        if(readText == "Yes" || readText == "No") { break; }
-                    } else if(playerID == 4) {
-                        String readText = dataIn.readUTF();
-                        System.out.println("Receive text from " + playerID + ": " + readText);
-                        performOperation(readText, playerID);
-                        if(readText == "Yes" || readText == "No") { break; }
-                    }
+//                    if(playerID == 1) {
+//                        String readText = dataIn.readUTF();
+//                        System.out.println("Receive text from " + playerID + ": " + readText);
+//                        performOperation(readText, playerID);
+//                        if(readText == "Yes" || readText == "No") { break; }
+//                    } else if(playerID == 2) {
+//                        String readText = dataIn.readUTF();
+//                        System.out.println("Receive text from " + playerID + ": " + readText);
+//                        performOperation(readText, playerID);
+//                        if(readText == "Yes" || readText == "No") { break; }
+//                    }
+//                    if(numConPlayers == 2) {
+//                        saveToJson();
+//                        continue;
+//                    }
+//                    if(playerID == 3) {
+//                        String readText = dataIn.readUTF();
+//                        System.out.println("Receive text from " + playerID + ": " + readText);
+//                        performOperation(readText, playerID);
+//                        if(readText == "Yes" || readText == "No") { break; }
+//                    } else if(playerID == 4) {
+//                        String readText = dataIn.readUTF();
+//                        System.out.println("Receive text from " + playerID + ": " + readText);
+//                        performOperation(readText, playerID);
+//                        if(readText == "Yes" || readText == "No") { break; }
+//                    }
                     saveToJson();
                 }
-                if(numOfNo != 0) closeConnection();
-//                //TODO send information for players that there is no nextGame
-//                while(numOfAnswer != numPlayers){
-//                    TimeUnit.SECONDS.sleep(1);
-//                }
-//                if(playerID == 1) {
-//                    divCardsForPlayers();
-//                }
-//                Thread t = new Thread(players[playerID - 1]);
-//                t.start();
-//                numOfNo = 0;
-            } catch (IOException ex )/*| (InterruptedException ex)*/ {
+
+                System.out.println("Enter infi loop " + numOfAnswer);
+                while(numOfAnswer != numPlayers){
+                    TimeUnit.SECONDS.sleep(1);
+                }
+                if(numOfNo != 0) {
+                    dataOut.writeUTF("No");
+                    return;
+                } else {
+                    dataOut.writeUTF("Yes");
+                }
+                System.out.println("Exit from infi loop");
+                if(playerID == 1) {
+                    divCardsForPlayers();
+                } else {
+                    TimeUnit.SECONDS.sleep(5);
+                }
+                System.out.println("Start thread for new game");
+                Thread t = new Thread(players[playerID - 1]);
+                t.start();
+                TimeUnit.SECONDS.sleep(60);
+                numOfAnswer = 0;
+            } catch (IOException | InterruptedException ex) {
                 System.out.println("IOException from run() SSC");
             }
+            System.out.println("End of thread " + playerID);
         }
 
     }

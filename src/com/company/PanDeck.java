@@ -59,8 +59,4 @@ public class PanDeck {
         }
         return tempDeck;
     }
-
-    public void deleteCard(int cardNum) {
-
-    }
 }

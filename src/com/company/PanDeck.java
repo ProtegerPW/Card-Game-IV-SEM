@@ -9,6 +9,7 @@ public class PanDeck {
     public PanDeck() {
         cards = new PanCard[24];
         this.setDeck();
+        shuffle();
     }
 
     public void setDeck() {

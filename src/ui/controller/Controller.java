@@ -266,6 +266,7 @@ public class Controller {
             mouseDisable();
             System.out.println("The game session has ended");
             gameView.showEndGameWindow();
+            //TODO if() send Yes or No based on clicked Button
         }
     }
 

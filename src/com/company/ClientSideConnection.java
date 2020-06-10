@@ -137,6 +137,14 @@ public class ClientSideConnection {
                     player.setNextPlayer();
                     player.sortHand();
                     break;
+
+                case "Yes":
+                    dataOut.writeUTF(text);
+                    dataOut.flush();
+
+                case "No":
+                    dataOut.writeUTF(text);
+                    dataOut.flush();
             }
 
         } catch(IOException ex){

@@ -24,14 +24,17 @@ public class GameServer {
     private ArrayList<PanCard> stockpile;
     private ServerJasonConverter gameServerJsonConverter;
     private int currentPlayer;
+    private int numOfAnswer;
+    private int numOfNo;
 
     public GameServer() {
         System.out.println("---- Game Server ----");
         numPlayers = 1;
         numConPlayers = 0;
+        numOfAnswer = 0;
+        numOfNo = 0;
         players = new ServerSideConnection[4];
-        gameDeck = new PanDeck();
-        gameDeck.shuffle();
+        //gameDeck = new PanDeck();
         stockpile = new ArrayList<PanCard>();
         playerHand = new ArrayList<ArrayList<PanCard>>(); // tablica tablic z kartami graczy
 
@@ -52,11 +55,28 @@ public class GameServer {
 
     public void setCurrentPlayer(int currentPlayer) { this.currentPlayer = currentPlayer; }
 
-    public int getNumOfPlayers() { return this.numPlayers; };
+    public int getNumOfPlayers() { return this.numPlayers; }
+
+    public void incNumOfAnswer(int direction) {
+        this.numOfAnswer++;
+        if(direction < 0) this.numOfNo++;
+    }
 
     public ArrayList<ArrayList<PanCard>> getPlayerHand() { return this.playerHand; }
 
     public ArrayList<PanCard> getStockpile() { return this.stockpile; }
+
+    public void divCardsForPlayers() {
+        gameDeck = new PanDeck();
+        if(playerHand != null) {
+            playerHand = new ArrayList<ArrayList<PanCard>>();
+        }
+        for(int i = 0; i < numPlayers; i++) {
+            ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+            playerHand.add(hand);
+            System.out.println("Created hand #" + (i + 1));
+        }
+    }
 
     public void waitForHost() {
         try {
@@ -73,11 +93,12 @@ public class GameServer {
             } catch (IOException ex) {
                 System.out.println("IOException from input Player number");
             }
-            for(int i = 0; i < numPlayers; i++) {
-                ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
-                playerHand.add(hand);
-                System.out.println("Created hand #" + (i + 1));
-            }
+            divCardsForPlayers();
+//            for(int i = 0; i < numPlayers; i++) {
+//                ArrayList<PanCard> hand = new ArrayList<PanCard>(Arrays.asList(gameDeck.drawCard(gameDeck.getLength() / numPlayers)));
+//                playerHand.add(hand);
+//                System.out.println("Created hand #" + (i + 1));
+//            }
             setFirstPlayer();
             numConPlayers++;
             Thread t = new Thread(ssc);
@@ -132,10 +153,44 @@ public class GameServer {
             }
         }
     }
+//test class to implement ObjectMapper to read from .json file and create Object in Java
+//    public class ItemDeserializer extends StdDeserializer<ServerConverter> {
+//
+//        public ItemDeserializer() {
+//            this(null);
+//        }
+//
+//        public ItemDeserializer(Class<?> vc) {
+//            super(vc);
+//        }
+//
+//        @Override
+//        public ServerConverter deserialize(JsonParser jp, DeserializationContext ctxt)
+//                throws IOException, JsonProcessingException {
+//            JsonNode node = jp.getCodec().readTree(jp);
+//            int numOfPlayers = (Integer) ((IntNode) node.get("numOfPlayers")).numberValue();
+//            int currentPlayer = (Integer) ((IntNode) node.get("currentPlayer")).numberValue();
+//            //JSONArray stockpile
+//            String itemName = node.get("itemName").
+//            int userId = (Integer) ((IntNode) node.get("createdBy")).numberValue();
+//
+//            return new Item(id, itemName, new User(userId, null));
+//        }
+//    }
 
-    public void saveToJson(){
+    public void saveToJson() throws IOException {
         gameServerJsonConverter = new ServerJasonConverter("gameServer.json");
         gameServerJsonConverter.toJson(new ServerConverter(getGameServer()));
+        //gameServerJsonConverter.fromJson().ifPresent(System.out::println);
+//        Gson g = new Gson();
+//        ServerConverter tempServer = g.fromJson("gameServer.json", ServerConverter.class);
+//        System.out.println("Num of cards on stockpile is " + tempServer.getStockpile().size());
+//        System.out.println("Num of cards for player #1 :" + tempServer.getPlayerHand().get(0).size());
+        //Objectmapper tempMapper;
+//        ObjectMapper mapper = new ObjectMapper();
+//        ServerConverter tempServer = mapper.readValue(new File("/home/jakub/IdeaProjects/newCardGame"), ServerConverter.class);
+//        System.out.println("Num of cards on stockpile is " + tempServer.getStockpile().size());
+//        System.out.println("Num of cards for player #1 :" + tempServer.getPlayerHand().get(0).size());
     }
 
     private class ServerSideConnection implements Runnable {
@@ -217,6 +272,15 @@ public class GameServer {
                         dataOut.flush();
                         drawCard(playerID, tempStockSize);
                         break;
+
+                    case "Yes":
+                        incNumOfAnswer(1);
+                        break;
+
+                    case "No":
+                        incNumOfAnswer(-1);
+                        break;
+
                 }
             }catch (IOException ex) {
                 System.out.println("IOException from performOperation() ");
@@ -248,6 +312,22 @@ public class GameServer {
             }
         }
 
+        public boolean checkIsEnd(){
+            int numOfFinPlayers = 0;
+            for(int i = 0; i < numPlayers; i++) {
+                if(playerHand.get(i).size() == 0) {
+                    numOfFinPlayers++;
+                }
+            }
+            if(numPlayers == 2 && numOfFinPlayers == 1 ||
+               numPlayers == 4 && numOfFinPlayers == 3) {
+                System.out.println("End of game");
+                return true;
+            } else {
+                return  false;
+            }
+        }
+
         public void run() {
             try {
                 int numOfCards = (gameDeck.getLength() / numPlayers);
@@ -267,10 +347,12 @@ public class GameServer {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
+                        if(readText == "Yes" || readText == "No") { break; }
                     } else if(playerID == 2) {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
+                        if(readText == "Yes" || readText == "No") { break; }
                     }
                     if(numConPlayers == 2) {
                         saveToJson();
@@ -280,14 +362,27 @@ public class GameServer {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
+                        if(readText == "Yes" || readText == "No") { break; }
                     } else if(playerID == 4) {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
+                        if(readText == "Yes" || readText == "No") { break; }
                     }
                     saveToJson();
                 }
-            } catch (IOException ex) {
+                if(numOfNo != 0) closeConnection();
+//                //TODO send information for players that there is no nextGame
+//                while(numOfAnswer != numPlayers){
+//                    TimeUnit.SECONDS.sleep(1);
+//                }
+//                if(playerID == 1) {
+//                    divCardsForPlayers();
+//                }
+//                Thread t = new Thread(players[playerID - 1]);
+//                t.start();
+//                numOfNo = 0;
+            } catch (IOException ex )/*| (InterruptedException ex)*/ {
                 System.out.println("IOException from run() SSC");
             }
         }

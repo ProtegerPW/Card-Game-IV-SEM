@@ -62,5 +62,6 @@
     </orderEntry>
     <orderEntry type="library" name="com.fasterxml.jackson.core:jackson-annotations:2.0.4" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.6" level="project" />
+    <orderEntry type="library" name="com.konghq:unirest-objectmapper-jackson:3.4.03" level="project" />
   </component>
 </module>

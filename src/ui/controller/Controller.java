@@ -272,6 +272,9 @@ public class Controller {
             else {
                 // TODO
             }
+            //TODO if() send Yes or No based on clicked Button
+            //TODO if() YES -> initGameSetup
+            //TODO if() NO -> closeConnection
         }
     }
 

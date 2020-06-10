@@ -12,6 +12,7 @@ public class GameSetup extends JFrame {
 
     public GameSetup() {
         setSize(400,280);
+        setTitle("Game setup");
         setContentPane(setupPanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

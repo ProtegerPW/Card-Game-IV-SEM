@@ -25,28 +25,30 @@ public class GameView extends JFrame {
     private JButton drawCardsButton;
     private JButton playSelectedButton;
 
-    private int currentPlayer;
+    private final int numOfPlayers;
+    private final int playerID;
 
-    private int numOfPlayers;
-    private int playerID;
-    private int cardCount[];
+    private int currentPlayer;
+    private int[] cardCount;
     private ArrayList<PanCard> hand;
-    private Map<PanCard, Rectangle> mapPlayerHand;
     private ArrayList<PanCard> stockpile;
+    private Map<PanCard, Rectangle> mapPlayerHand;
     private Map<PanCard, Rectangle> mapStockpile;
 
-    public GameView(int playerID, int currentPlayer, ArrayList<PanCard> hand, int cardCount[]) {
+    public GameView(int playerID, int currentPlayer, ArrayList<PanCard> hand, int[] cardCount) {
         this.playerID = playerID;
         this.currentPlayer = currentPlayer;
         this.hand = hand;
         this.cardCount = cardCount;
         numOfPlayers = this.cardCount.length;
         setSize(1280, 760);
+        setTitle("Pan");
         setContentPane(mainGamePanel);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }
 
+        // initialize custom JPanels
     private void createUIComponents() {
         playerHand = new PlayerHand();
         opponentHand2 = new OpponentHandHorizontal();
@@ -61,45 +63,7 @@ public class GameView extends JFrame {
         }
     }
 
-    public void showGameWindow() {
-        setVisible(true);
-    }
-
-    public ArrayList<PanCard> getHand() {
-        return hand;
-    }
-
-    public void setHand(ArrayList<PanCard> hand) {
-        this.hand = hand;
-    }
-
-    public Map<PanCard, Rectangle> getMapPlayerHand() {
-        return mapPlayerHand;
-    }
-
-    public void setMapPlayerHand(Map<PanCard, Rectangle> mapPlayerHand) {
-        this.mapPlayerHand = mapPlayerHand;
-    }
-
-    public int[] getCardCount() {
-        return cardCount;
-    }
-
-    public void setCardCount(int[] cardCount) {
-        this.cardCount = cardCount;
-    }
-
-    public ArrayList<PanCard> getStockpile() {
-        return stockpile;
-    }
-
-    public void setStockpile(ArrayList<PanCard> stockpile) {
-        this.stockpile = stockpile;
-    }
-
-    public void setCurrentPlayer(int currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public JButton getDrawCardsButton() {
         return drawCardsButton;
@@ -107,6 +71,32 @@ public class GameView extends JFrame {
 
     public JButton getPlaySelectedButton() {
         return playSelectedButton;
+    }
+
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void setCardCount(int[] cardCount) {
+        this.cardCount = cardCount;
+    }
+
+    public void setHand(ArrayList<PanCard> hand) {
+        this.hand = hand;
+    }
+
+    public void setStockpile(ArrayList<PanCard> stockpile) {
+        this.stockpile = stockpile;
+    }
+
+    public Map<PanCard, Rectangle> getMapPlayerHand() {
+        return mapPlayerHand;
+    }
+
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+    public void showGameWindow() {
+        setVisible(true);
     }
 
     public void enableDrawCardsButton() {
@@ -125,25 +115,21 @@ public class GameView extends JFrame {
         playSelectedButton.setEnabled(false);
     }
 
+    // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+        // show a pop-up window after a game is finished, determine if a player wants to play again or not
     public boolean endGameWindow() {
         boolean newGame;
         String message = "Game Finished - Player #" + currentPlayer + " lost.\n Do you want to play again?";
         int option = JOptionPane.showConfirmDialog(this, message,"Game finished", JOptionPane.YES_NO_OPTION);
-        if (option == JOptionPane.YES_OPTION)
-            newGame= true;
-        else
-            newGame = false;
+        newGame = option == JOptionPane.YES_OPTION;
         return newGame;
     }
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // custom JPanel displaying available moves and cards in player's hand
     public class PlayerHand extends JPanel {
-        int cardHeight;
-        int cardWidth;
-        int deltaX;
-        int bottomMargin;
-
         final int SMALL_BOTTOM = 10;
         final int BOTTOM = 20;
         final int TOP_MARGIN = 50;
@@ -157,7 +143,6 @@ public class GameView extends JFrame {
             drawCardsButton.setEnabled(false);
             playSelectedButton.setEnabled(false);
             addElementsToFrame();
-            //setBackground(Color.CYAN);
         }
 
         public void addElementsToFrame() {
@@ -171,12 +156,10 @@ public class GameView extends JFrame {
             mapPlayerHand.clear();
             if(hand.size() == 0)
                 return;
-            //
-            bottomMargin = getHeight() < 200? SMALL_BOTTOM : BOTTOM;
-            cardHeight = Math.min(getHeight() - TOP_MARGIN - bottomMargin, MAX_CARD_HEIGHT);
-            cardWidth = 2 * cardHeight / 3;
-            deltaX = Math.min(2 * cardHeight / 9, (getWidth() - 2 * SIDE_MARGIN - cardWidth)/hand.size());
-            //
+            int bottomMargin = getHeight() < 200? SMALL_BOTTOM : BOTTOM;
+            int cardHeight = Math.min(getHeight() - TOP_MARGIN - bottomMargin, MAX_CARD_HEIGHT);
+            int cardWidth = 2 * cardHeight / 3;
+            int deltaX = Math.min(2 * cardHeight / 9, (getWidth() - 2 * SIDE_MARGIN - cardWidth)/hand.size());
             int xPos = ((getWidth() - cardWidth - (hand.size() - 1)* deltaX)/2);
             int yPos = getHeight() - bottomMargin - cardHeight;
             for (PanCard card: hand) {
@@ -219,8 +202,9 @@ public class GameView extends JFrame {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // custom JPanel displaying amount of cards in opponent opposite to player's hand
     public class OpponentHandHorizontal extends JPanel {
-        private ArrayList<Rectangle> mapCards;
+        private final ArrayList<Rectangle> mapCards;
 
         int cardHeight;
         int cardWidth;
@@ -233,7 +217,6 @@ public class GameView extends JFrame {
 
         public OpponentHandHorizontal() {
             mapCards = new ArrayList<>();
-            //setBackground(Color.MAGENTA);
         }
 
         @Override
@@ -290,14 +273,10 @@ public class GameView extends JFrame {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // custom JPanel displaying amount of cards in opponents next to players' hand
     public class OpponentHandVertical extends JPanel {
-        String alignment;
-        ArrayList<Rectangle> mapCards;
-        //
-        int cardHeight;
-        int cardWidth;
-        int deltaY;
-        int margin;
+        private final String alignment;
+        private final ArrayList<Rectangle> mapCards;
         //
         final int SMALL_MARGIN = 10;
         final int MARGIN = 20;
@@ -308,7 +287,6 @@ public class GameView extends JFrame {
         public OpponentHandVertical(String alignment) {
             mapCards = new ArrayList<>();
             this.alignment = alignment;
-            //setBackground(Color.ORANGE);
         }
 
         @Override
@@ -320,14 +298,12 @@ public class GameView extends JFrame {
             if(opponentNumberOfCards == 0) {
                 return;
             }
-            //
-            margin = getWidth() < 140? SMALL_MARGIN : MARGIN;
-            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
-            cardWidth = Math.min(getWidth() - 2 * margin, MAX_CARD_WIDTH);
-            cardHeight = 2 * cardWidth / 3;
-            deltaY = Math.min(2 * cardWidth / 9, (getHeight() - 2 * SMALL_MARGIN - cardHeight)/opponentNumberOfCards);
-            //
+            int margin = getWidth() < 140? SMALL_MARGIN : MARGIN;
+            int cardWidth = Math.min(getWidth() - 2 * margin, MAX_CARD_WIDTH);
+            int cardHeight = 2 * cardWidth / 3;
+            int deltaY = Math.min(2 * cardWidth / 9, (getHeight() - 2 * SMALL_MARGIN - cardHeight)/opponentNumberOfCards);
             int handHeight = cardHeight + (opponentNumberOfCards - 1) * deltaY;
+            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
             int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - cardHeight : (getHeight() - handHeight)/2;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
                 Rectangle bounds = new Rectangle(xPos, yPos, cardWidth, cardHeight);
@@ -381,15 +357,12 @@ public class GameView extends JFrame {
 
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
+        // custom JPanel displaying stockpile, player IDs and turn icon
     public class StockpilePanel extends JPanel {
         private final ArrayList<PanCard> cardsForDisplay;
         private final Path2D turnIcon;
         private JLabel[] names;
         //
-        int cardHeight;
-        int cardWidth;
-        int deltaX;
-
         final int OVERLAP = 5;
         final int MARGIN = 20;
         final int PILE_MARGIN = 50;
@@ -404,7 +377,6 @@ public class GameView extends JFrame {
             mapStockpile = new HashMap<>(1);
             turnIcon = new Path2D.Double();
             setLabels();
-            //setBackground(Color.YELLOW);
         }
 
         @Override
@@ -417,10 +389,9 @@ public class GameView extends JFrame {
             turnIcon.reset();
             setLabelsPositions();
             //
-            cardHeight = Math.min(getHeight() - 2 * PILE_MARGIN, MAX_CARD_HEIGHT);
-            cardWidth = 2 * cardHeight / 3;
-            deltaX = 2 * cardHeight / 9;
-            //
+            int cardHeight = Math.min(getHeight() - 2 * PILE_MARGIN, MAX_CARD_HEIGHT);
+            int cardWidth = 2 * cardHeight / 3;
+            int deltaX = 2 * cardHeight / 9;
             int xPos = (getWidth() - cardWidth)/2;
             int yPos = (getHeight() - cardHeight)/2;
             int pileSize = stockpile.size();
@@ -479,6 +450,7 @@ public class GameView extends JFrame {
             g2d.setClip(0, 0, bounds.width - 5, bounds.height - 5);
         }
 
+            // basing on player ID and current player ID, determine which icon should be displayed, get info about drawing that icon
         private void getTurnIcon() {
             int posX, posY, iconPosition;
             if(numOfPlayers == 2) {
@@ -530,6 +502,7 @@ public class GameView extends JFrame {
             }
         }
 
+            // create labels with player IDs, store them in an array
         private void setLabels() {
             names = new JLabel[numOfPlayers];
             int ID;
@@ -540,6 +513,7 @@ public class GameView extends JFrame {
             }
         }
 
+            // aligns player names into their positions on game panel
         private void setLabelsPositions() {
             add(names[0], BorderLayout.SOUTH);
             names[0].setHorizontalAlignment(SwingConstants.CENTER);

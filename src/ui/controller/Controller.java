@@ -13,12 +13,16 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Controller {
-    private Player player;
-    private ClientSideConnection clientSideConnection;
-    //
-    private Menu menu;
+    private final Player player;
+    private final ClientSideConnection clientSideConnection;
+
+    private final Menu menu;
     private GameSetup gameSetup;
     private GameView gameView;
+
+    boolean mouseStatus = false;
+
+    final int PULL_CARD_DELTA_Y = 20;
 
     public Controller(Player player, ClientSideConnection clientSideConnection, Menu menu) {
         this.player = player;
@@ -30,7 +34,7 @@ public class Controller {
     public void displayMenu() {
         menu.showMenuWindow();
         menu.getPlayButton().addActionListener(new Controller.PlayButtonListener());
-        menu.getExitButton().addActionListener(new Controller.ExitButtonListener());
+        menu.getExitButton().addActionListener(new ExitButtonListener());
     }
 
         // if playerID == 1 -> open game setup, otherwise -> open main game frame
@@ -49,8 +53,9 @@ public class Controller {
             }
         }
     }
+
         // if player chooses exit -> close game
-    private class ExitButtonListener implements ActionListener {
+    private static class ExitButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent actionEvent) {
             System.exit(0);
         }
@@ -73,7 +78,7 @@ public class Controller {
             int numPlayers = Integer.parseInt(b.getText());
             clientSideConnection.setPlayersNumber(numPlayers);  // send selected player number to server
             clientSideConnection.getPlayerInitialHand();
-            System.out.println("Number of players: " + numPlayers);
+            System.out.println("Number of players: " + numPlayers);     // --log
             initGameView();                                     // display game frame
             gameSetup.dispose();                                //
             menu.dispose();                                     // close other windows
@@ -92,38 +97,51 @@ public class Controller {
         updateGameState();
     }
 
-    boolean mouseStatus = false;
-
-    public void mouseEnable() {
-        mouseStatus = true;
+        // fires when player hits "draw cards" button
+    private class DrawCardsListener implements ActionListener {
+        public void actionPerformed(ActionEvent actionEvent) {
+            clientSideConnection.sendCommunicate("drawCards", null);
+            updateStockpile();
+            updatePlayerHand();
+            updateGameState();
+        }
     }
 
-    public void mouseDisable() {
-        mouseStatus = false;
+        // fires when player hits "play selected card" button
+    private class PlaySelectedListener implements ActionListener {
+        public void actionPerformed(ActionEvent actionEvent) {
+            clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
+            resetSelectedCards();
+            updateStockpile();
+            updatePlayerHand();
+            updateGameState();
+        }
     }
 
+        // main listener: checks where a click was made and, if player clicks a card,
+        // changes gameView state according to implemented decision trees
     public class PlayerHandListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(!mouseStatus) {           // activates only on player's turn
                 return;
             }
-            System.out.println( "Clicked" );    // --delete later
+            System.out.println( "Clicked" );                    // --log
             PanCard clicked = getClickedCard(e);
             if(clicked == null) {                          // if player clicked no card -> return (do nothing)
-                System.out.println("No cards selected");        // --delete later
+                System.out.println("No cards selected");        // --log
                 return;
             }
             if (!player.checkCardIsValid(clicked)) {       // check if the move is valid
-                System.out.println("Illegal move");             // --delete later
+                System.out.println("Illegal move");             // --log
                 return;
             }
             if(player.getSelectedCards().size() == 0) {
                 if(!player.checkMultiCard(clicked)) {        // check if player has all cards of clicked card value
-                    System.out.println("Play clicked card");    // if no -> play clicked card   // --delete later
+                    System.out.println("Play clicked card");       // if false -> play clicked card  --log
                     clientSideConnection.sendCommunicate("addCards", new ArrayList<PanCard>() {{ add(clicked); }});
                     updateStockpile();
-                    updatePlayerHand();     // update playerHand view
+                    updatePlayerHand();
                     updateGameState();
                 }
                 else {
@@ -132,17 +150,17 @@ public class Controller {
                     updateButtons();
                 }
             }
-            else {                                          // player can play multiple cards
-                System.out.println("Multiple cards option");    // --delete later
+            else {      // player can play multiple cards
+                System.out.println("Multiple cards option");    // --log
                 if(player.getSelectedCards().get(0).getValue() != clicked.getValue()) {     // there are cards selected, but player clicked card of another value
-                    return;                                                                    // do nothing
+                    return;                                                                     // do nothing
                 }
                 for (PanCard card : player.getSelectedCards()) {
                     if (card == clicked ) {         // if player clicks a card already selected
                         if(player.checkCardIsHeartNine(clicked))
                             return;
-                        pullCardDown(clicked);                  // deselect card
-                        player.removeCardFromSelected(clicked);
+                        pullCardDown(clicked);                      // deselect card
+                        player.removeCardFromSelected(clicked);     // mark card as deselected
                         updateButtons();
                         return;
                     }
@@ -151,9 +169,10 @@ public class Controller {
                 pullCardUp(clicked);                    // display selection on player's hand
                 player.pushCardToSelected(clicked);     // mark card as selected
                 updateButtons();
-                    // check if all selected cards can be played
+                    // if player selected 4 cards of any value OR selected 3 9s and none of them is 9 of hearts -> play all selected cards
                 if (player.getSelectedCards().size() == 4
-                    || (player.getSelectedCards().size() == 3 && player.getSelectedCards().get(0).getValueInt() == 0 && player.getSelectedCards().get(0).getColorInt() != 0)) {
+                    || (player.getSelectedCards().size() == 3 && player.getSelectedCards().get(0).getValueInt() == 0
+                        && player.getSelectedCards().get(0).getColorInt() != 0)) {
                     clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
                     resetSelectedCards();
                     updateStockpile();
@@ -163,6 +182,7 @@ public class Controller {
             }
         }
 
+            // obtain information about card clicked by player, if player clicks outside of card area -> return null
         public PanCard getClickedCard(MouseEvent e) {
             for(PanCard card: player.getReversedHandOfCards()) {
                 Rectangle bounds = gameView.getMapPlayerHand().get(card);
@@ -174,33 +194,55 @@ public class Controller {
         }
     }
 
-    private class DrawCardsListener implements ActionListener {
-        public void actionPerformed(ActionEvent actionEvent) {
-            clientSideConnection.sendCommunicate("drawCards", null);
-            updateStockpile();
-            updatePlayerHand();
-            updateGameState();
+        // obtain changes about game after every move, if game ends -> begin new game sequence
+    public void updateGameState() {
+        if(!player.checkIsEnd()) {  // if the game is on
+            if (player.getCurrentPlayer() != player.getPlayerID()) {    // if it's another player's turn
+                mouseDisable();                             // disable listeners
+                gameView.disableDrawCardsButton();
+                gameView.disablePlaySelectedButton();
+                Thread t = new Thread(new Runnable() {      // wait for another turn
+                    @Override
+                    public void run() {
+                        updateStatus();
+                    }
+                });
+                t.start();
+                System.out.println("Mouse disable");            // --log
+            } else {    // it's player's turn
+                mouseEnable();                              // enable listeners if an action can be made
+                if (player.getStockpileSize() >= 2)
+                    gameView.enableDrawCardsButton();
+                System.out.println("Mouse enable");             // --log
+            }
+        } else {        // game ended
+            gameView.disablePlaySelectedButton();           // disable listeners
+            gameView.disableDrawCardsButton();
+            mouseDisable();
+            System.out.println("The game session has ended");   // --log
+            boolean newGame = gameView.endGameWindow();     // display new game option panel, wait for player response
+            if(newGame == true) {
+                // TODO
+            }
+            else {
+                // TODO
+            }
+            //TODO if() send Yes or No based on clicked Button
+            //TODO if() YES -> initGameSetup
+            //TODO if() NO -> closeConnection
         }
     }
 
-    private class PlaySelectedListener implements ActionListener {
-        public void actionPerformed(ActionEvent actionEvent) {
-            clientSideConnection.sendCommunicate("addCards", player.getSelectedCards());
-            resetSelectedCards();
-            updateStockpile();
-            updatePlayerHand();
-            updateGameState();
-        }
-    }
-
+        // update game view after any opponent's turn
     public void updateStatus() {
         clientSideConnection.receiveUpdate();
-        updateOpponentHand();
+        updateOpponentHands();
         player.setNextPlayer();
         updateStockpile();
         updateGameState();
     }
 
+        // disable/enable buttons depending on amount of cards selected
     public void updateButtons() {
         if(player.getSelectedCards().size() == 0) {
             gameView.disablePlaySelectedButton();
@@ -214,6 +256,7 @@ public class Controller {
         }
     }
 
+        // update stockpile view after any change
     public void updateStockpile() {
         gameView.setStockpile(player.getStockpile());
         gameView.setCurrentPlayer(player.getCurrentPlayer());
@@ -221,13 +264,15 @@ public class Controller {
         gameView.stockpilePanel.repaint();
     }
 
+        // update player hand view after any change
     public void updatePlayerHand() {
         gameView.setHand(player.getHandOfCards());
         gameView.playerHand.invalidate();
         gameView.playerHand.repaint();
     }
 
-    public void updateOpponentHand() {
+        // update opponent hands views after any change
+    public void updateOpponentHands() {
         int[] tmp = player.getCardCount();
         gameView.setCardCount(tmp);
         gameView.opponentHand2.invalidate();
@@ -240,44 +285,15 @@ public class Controller {
         }
     }
 
-    public void updateGameState() {
-        if(!player.checkIsEnd()) {
-            if (player.getCurrentPlayer() != player.getPlayerID()) {
-                mouseDisable();
-                gameView.disableDrawCardsButton();
-                gameView.disablePlaySelectedButton();
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateStatus();
-                    }
-                });
-                t.start();
-                System.out.println("Mouse disable");
-            } else {
-                mouseEnable();
-                if (player.getStockpileSize() >= 2)
-                    gameView.enableDrawCardsButton();
-                System.out.println("Mouse enable");
-            }
-        } else {
-            gameView.disablePlaySelectedButton();
-            gameView.disableDrawCardsButton();
-            mouseDisable();
-            System.out.println("The game session has ended");
-            boolean newGame = gameView.endGameWindow();
-            if(newGame == true) {
-                // TODO
-            }
-            else {
-                // TODO
-            }
-            //TODO if() send Yes or No based on clicked Button
-            //TODO if() YES -> initGameSetup
-            //TODO if() NO -> closeConnection
-        }
+    public void mouseEnable() {
+        mouseStatus = true;
     }
 
+    public void mouseDisable() {
+        mouseStatus = false;
+    }
+
+        // pull down and mark as deselected any selected cards in player's hand
     public void resetSelectedCards() {
         for(PanCard card: player.getSelectedCards()) {
             pullCardDown(card);
@@ -285,15 +301,13 @@ public class Controller {
         player.resetSelectedCards();
     }
 
-    final int PULL_CARD_DELTA_Y = 20;
-
-    // move card up in playerHand view -> select clicked card
+        // move card up in playerHand view -> select clicked card
     public void pullCardUp(PanCard card) {
         gameView.getMapPlayerHand().get(card).y -= PULL_CARD_DELTA_Y;
         gameView.playerHand.repaint();
     }
 
-    // move card down in playerHand view -> deselect highlighted card
+        // move card down in playerHand view -> deselect highlighted card
     public void pullCardDown(PanCard card) {
         gameView.getMapPlayerHand().get(card).y += PULL_CARD_DELTA_Y;
         gameView.playerHand.repaint();

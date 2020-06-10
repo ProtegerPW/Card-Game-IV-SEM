@@ -35,7 +35,6 @@ public class GameView extends JFrame {
     private ArrayList<PanCard> stockpile;
     private Map<PanCard, Rectangle> mapStockpile;
 
-
     public GameView(int playerID, int currentPlayer, ArrayList<PanCard> hand, int cardCount[]) {
         this.playerID = playerID;
         this.currentPlayer = currentPlayer;
@@ -126,6 +125,17 @@ public class GameView extends JFrame {
         playSelectedButton.setEnabled(false);
     }
 
+    public boolean endGameWindow() {
+        boolean newGame;
+        String message = "Game Finished - Player #" + currentPlayer + " lost.\n Do you want to play again?";
+        int option = JOptionPane.showConfirmDialog(this, message,"Game finished", JOptionPane.YES_NO_OPTION);
+        if (option == JOptionPane.YES_OPTION)
+            newGame= true;
+        else
+            newGame = false;
+        return newGame;
+    }
+
     // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
 
     public class PlayerHand extends JPanel {
@@ -146,11 +156,12 @@ public class GameView extends JFrame {
             playSelectedButton = new JButton("play selected card");
             drawCardsButton.setEnabled(false);
             playSelectedButton.setEnabled(false);
-            addButtonsToFrame();
+            addElementsToFrame();
+
             setBackground(Color.CYAN);
         }
 
-        public void addButtonsToFrame() {
+        public void addElementsToFrame() {
             add(drawCardsButton);
             add(playSelectedButton);
         }
@@ -230,14 +241,16 @@ public class GameView extends JFrame {
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
-            //
+            int index = numOfPlayers == 2? playerID % numOfPlayers : (playerID + 1) % numOfPlayers;
+            int opponentNumberOfCards = cardCount[index];
+            if(opponentNumberOfCards == 0) {
+                return;
+            }
             margin = getHeight() < 140? SMALL_MARGIN : MARGIN;
             cardHeight = Math.min(getHeight() - 2 * margin, MAX_CARD_HEIGHT);
             cardWidth = 2 * cardHeight / 3;
-            deltaX = 2 * cardHeight / 9;
+            deltaX = Math.min(2 * cardHeight / 9, (getWidth() - 2 * SMALL_MARGIN - cardWidth)/opponentNumberOfCards);
             //
-            int index = numOfPlayers == 2? playerID % numOfPlayers : (playerID + 1) % numOfPlayers;
-            int opponentNumberOfCards = cardCount[index];
             int xPos = ((getWidth() - cardWidth - (opponentNumberOfCards - 1)* deltaX)/2);
             int yPos = margin;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
@@ -294,24 +307,27 @@ public class GameView extends JFrame {
         final int ROT_DEG_RIGHT = 90;
 
         public OpponentHandVertical(String alignment) {
-            setBackground(Color.ORANGE);
             mapCards = new ArrayList<>();
             this.alignment = alignment;
+            setBackground(Color.ORANGE);
         }
 
         @Override
         public void invalidate() {
             super.invalidate();
             mapCards.clear();
+            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
+            int opponentID = alignment.equals("left") ? playerID: playerID + 2;
+            int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
+            if(opponentNumberOfCards == 0) {
+                return;
+            }
             //
             margin = getWidth() < 140? SMALL_MARGIN : MARGIN;
             cardWidth = Math.min(getWidth() - 2 * margin, MAX_CARD_WIDTH);
             cardHeight = 2 * cardWidth / 3;
-            deltaY = 2 * cardWidth / 9;
+            deltaY = Math.min(2 * cardWidth / 9, (getHeight() - 2 * SMALL_MARGIN - cardHeight)/opponentNumberOfCards);
             //
-            int xPos = alignment.equals("left") ? margin : getWidth() - margin - cardWidth;
-            int opponentID = alignment.equals("left") ? playerID: playerID + 2;
-            int opponentNumberOfCards = cardCount[opponentID % numOfPlayers];
             int handHeight = cardHeight + (opponentNumberOfCards - 1) * deltaY;
             int yPos = alignment.equals("left") ? (getHeight() + handHeight)/2  - cardHeight : (getHeight() - handHeight)/2;
             for(int i = 0; i < opponentNumberOfCards; ++i ) {
@@ -368,7 +384,8 @@ public class GameView extends JFrame {
 
     public class StockpilePanel extends JPanel {
         private final ArrayList<PanCard> cardsForDisplay;
-        private Path2D turnIcon;
+        private final Path2D turnIcon;
+        private JLabel[] names;
         //
         int cardHeight;
         int cardWidth;
@@ -382,10 +399,13 @@ public class GameView extends JFrame {
         final int TURN_ICON_HEIGHT = 20;
 
         public StockpilePanel() {
+            setLayout(new BorderLayout());
             stockpile = new ArrayList<>();
             cardsForDisplay = new ArrayList<>();
             mapStockpile = new HashMap<>(1);
             turnIcon = new Path2D.Double();
+            setLabels();
+            setBackground(Color.YELLOW);
         }
 
         @Override
@@ -396,6 +416,7 @@ public class GameView extends JFrame {
             PanCard card;
             Rectangle bounds;
             turnIcon.reset();
+            setLabelsPositions();
             //
             cardHeight = Math.min(getHeight() - 2 * PILE_MARGIN, MAX_CARD_HEIGHT);
             cardWidth = 2 * cardHeight / 3;
@@ -509,16 +530,30 @@ public class GameView extends JFrame {
                     break;
             }
         }
-    }
 
-    public void showEndGameWindow() {
-        // TODO
-        //String message = "Game Finished - Player #" + currentPlayer + "lost.";
-        //int option = JOptionPane.showMessageDialog(this,  message, "Game finished.");
-//        if (option == JOptionPane.YES_OPTION)
-//            new_game = true;
-//        else if (option == JOptionPane.NO_OPTION || option == JOptionPane.CANCEL_OPTION
-//                || option == JOptionPane.CLOSED_OPTION)
-//            new_game = false;
+        private void setLabels() {
+            names = new JLabel[numOfPlayers];
+            int ID;
+            for(int i = 0; i < numOfPlayers; ++i) {
+                ID = playerID + i;
+                ID -= ID > numOfPlayers? numOfPlayers : 0;
+                names[i] = new JLabel("#" + ID);
+            }
+        }
+
+        private void setLabelsPositions() {
+            add(names[0], BorderLayout.SOUTH);
+            names[0].setHorizontalAlignment(SwingConstants.CENTER);
+            if(numOfPlayers == 2) {
+                add(names[1], BorderLayout.NORTH);
+                names[1].setHorizontalAlignment(SwingConstants.CENTER);
+            }
+            else {
+                add(names[1], BorderLayout.WEST);
+                add(names[2], BorderLayout.NORTH);
+                names[2].setHorizontalAlignment(SwingConstants.CENTER);
+                add(names[3], BorderLayout.EAST);
+            }
+        }
     }
 }

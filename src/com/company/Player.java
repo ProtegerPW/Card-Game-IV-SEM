@@ -10,10 +10,8 @@ public class Player {
     private int currentPlayer;
     private int turn;
     private boolean buttonsEnable;
-    private ArrayList<PanCard> handOfCards;
-
-
     private int[] cardCount;
+    private ArrayList<PanCard> handOfCards;
     private ArrayList<PanCard> selectedCards;
     private ArrayList<PanCard> stockpile;
 
@@ -28,7 +26,7 @@ public class Player {
 
     public void setPlayerID(int playerID) { this.playerID = playerID; }
 
-    public int getCurrentPlayer() { return currentPlayer; }
+    public int getCurrentPlayer() { return this.currentPlayer; }
 
     public void setCurrentPlayer(int numOfPlayer) { this.currentPlayer = numOfPlayer;}
 
@@ -78,6 +76,14 @@ public class Player {
 
     public ArrayList<PanCard> getStockpile() {
         return stockpile;
+    }
+
+    public void resetStockpile() {
+        stockpile.clear();
+    }
+
+    public void resetHandOfCards() {
+        handOfCards.clear();
     }
 
     public void initCardCount(int cardNumber) {

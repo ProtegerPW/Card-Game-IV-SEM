@@ -9,7 +9,10 @@ import ui.view.Menu;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class Controller {
@@ -268,9 +271,21 @@ public class Controller {
             boolean newGame = gameView.endGameWindow();
             if(newGame == true) {
                 // TODO
+                clientSideConnection.sendCommunicate("Yes",null);
+                if(clientSideConnection.getdataInUTF().equals("No")) {
+                    gameView.dispose();
+                    return;
+                } else {
+                    clientSideConnection.getPlayerInitialHand();
+                    //gameView.dispose();
+                    initGameView();
+                    //updateGameState();
+                }
             }
             else {
                 // TODO
+                clientSideConnection.sendCommunicate("No",null);
+                gameView.dispose();
             }
             //TODO if() send Yes or No based on clicked Button
             //TODO if() YES -> initGameSetup

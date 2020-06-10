@@ -298,13 +298,11 @@ public class GameServer {
                 dataOut.writeInt(getCurrentPlayer());
                 dataOut.flush();
 
-                while(true) { //TODO send players number of cards of their opponents
-                            //TODO send player new stockpile
+                while(true) {
                     if(playerID == 1) {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
                         performOperation(readText, playerID);
-
                     } else if(playerID == 2) {
                         String readText = dataIn.readUTF();
                         System.out.println("Receive text from " + playerID + ": " + readText);
@@ -325,8 +323,6 @@ public class GameServer {
                     }
                     saveToJson();
                 }
-                //TODO send info to other player about number of cards in hand
-
             } catch (IOException ex) {
                 System.out.println("IOException from run() SSC");
             }

@@ -84,7 +84,7 @@ public class Controller {
 
         // display game frame, create listener for player hand
     private void initGameView() {
-        gameView = new GameView(player.getPlayerID(), player.getHandOfCards(), player.getCardCount());
+        gameView = new GameView(player.getPlayerID(), player.getCurrentPlayer(), player.getHandOfCards(), player.getCardCount());
         gameView.showGameWindow();
         gameView.playerHand.addMouseListener(new PlayerHandListener());
         gameView.getDrawCardsButton().addActionListener(new DrawCardsListener());
@@ -195,9 +195,9 @@ public class Controller {
 
     public void updateStatus() {
         clientSideConnection.receiveUpdate();
-        updateStockpile();
         updateOpponentHand();
         player.setNextPlayer();
+        updateStockpile();
         configButtons();
     }
 
@@ -216,6 +216,7 @@ public class Controller {
 
     public void updateStockpile() {
         gameView.setStockpile(player.getStockpile());
+        gameView.setCurrentPlayer(player.getCurrentPlayer());
         gameView.stockpilePanel.invalidate();
         gameView.stockpilePanel.repaint();
     }
@@ -264,7 +265,7 @@ public class Controller {
             gameView.disableDrawCardsButton();
             mouseDisable();
             System.out.println("The game session has ended");
-            //TODO print communicate that there are winners
+            gameView.showEndGameWindow();
         }
     }
 

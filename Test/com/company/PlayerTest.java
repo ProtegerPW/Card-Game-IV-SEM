@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class PlayerTest {
 
     @Test
@@ -77,11 +75,11 @@ class PlayerTest {
     void changeCardCount() {
         Player tempPlayer = new Player();
         tempPlayer.initCardCount(6);
-        tempPlayer.changeCardCount(1,-1);
-        tempPlayer.changeCardCount(2,1);
-        tempPlayer.changeCardCount(3,-1);
-        tempPlayer.changeCardCount(3, -1);
-        tempPlayer.changeCardCount(2,1);
+        tempPlayer.setCardCount(1,-1);
+        tempPlayer.setCardCount(2,1);
+        tempPlayer.setCardCount(3,-1);
+        tempPlayer.setCardCount(3, -1);
+        tempPlayer.setCardCount(2,1);
         Assert.assertEquals(5,tempPlayer.getCardCount()[0]);
         Assert.assertEquals(8,tempPlayer.getCardCount()[1]);
         Assert.assertEquals(4,tempPlayer.getCardCount()[2]);
